@@ -1,0 +1,21 @@
+name = "regi-ingest"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+# nodejs_compat: ulid() and node:crypto createHash are on the hot path
+# (ADR 0009). Required regardless of the @regi/db/client factory.
+compatibility_flags = ["nodejs_compat"]
+
+# ePublikation polls every 30 minutes (CLAUDE.md §6, INGEST-PLAN §i).
+[triggers]
+crons = ["*/30 * * * *"]
+
+# Raw audit trail, 12-month retention via an R2 bucket lifecycle rule
+# configured out-of-band before first deploy (CLAUDE.md §7, INGEST-PLAN §d/§k).
+[[r2_buckets]]
+binding = "RAW"
+bucket_name = "regi-raw"
+
+# Secrets/vars are NEVER committed here. Local dev reads apps/ingest/.dev.vars
+# (symlink → repo-root .env.local, gitignored). Production: `wrangler secret
+# put <NAME>`. Required by the worker: DATABASE_URL, SITE_URL,
+# INGEST_REVALIDATE_SECRET, REGI_USER_AGENT. See ADR 0009 / INGEST-PLAN §f.

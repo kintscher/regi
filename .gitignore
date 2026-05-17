@@ -37,6 +37,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare workers: wrangler local state + dev secrets
+.wrangler/
+.dev.vars
+!.dev.vars.example
+
 # neon cli local context (org/project ids — never commit)
 .neon
 

@@ -1,0 +1,12 @@
+# Wrangler does not read the repo-root .env.local. The sanctioned local setup
+# is a symlink (mirrors the apps/web symlink, ADR 0008 "Env-1"):
+#
+#   ln -s ../../.env.local apps/ingest/.dev.vars
+#
+# .dev.vars is gitignored; this .example file is committed as documentation.
+# Production secrets are set with `wrangler secret put <NAME>`, never here.
+# See ADR 0009 / INGEST-PLAN §f.
+DATABASE_URL=
+SITE_URL=
+INGEST_REVALIDATE_SECRET=
+REGI_USER_AGENT=
