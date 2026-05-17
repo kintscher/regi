@@ -11,6 +11,7 @@
     "db:migrate": "pnpm --filter @regi/db migrate",
     "db:studio": "pnpm --filter @regi/db studio",
     "db:seed": "pnpm --filter @regi/db seed",
+    "db:seed:sources": "pnpm --filter @regi/db seed:sources",
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "devDependencies": {

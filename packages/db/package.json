@@ -12,7 +12,8 @@
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio",
-    "seed": "node --env-file=../../.env.local scripts/seed-mock.mts"
+    "seed": "node --env-file=../../.env.local scripts/seed-mock.mts",
+    "seed:sources": "node --env-file=../../.env.local scripts/seed-static-sources.mts"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.1.0",
