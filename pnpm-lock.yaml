@@ -7,13 +7,19 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@biomejs/biome':
+        specifier: 2.4.15
+        version: 2.4.15
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  apps/web:
     dependencies:
-      '@neondatabase/serverless':
-        specifier: 1.1.0
-        version: 1.1.0
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@neondatabase/serverless@1.1.0)
+      '@regi/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       next:
         specifier: 16.2.6
         version: 16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -23,13 +29,7 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
-      ulid:
-        specifier: 3.0.2
-        version: 3.0.2
     devDependencies:
-      '@biomejs/biome':
-        specifier: 2.4.15
-        version: 2.4.15
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.0
@@ -42,12 +42,31 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.14)
-      drizzle-kit:
-        specifier: 0.31.10
-        version: 0.31.10
       tailwindcss:
         specifier: ^4
         version: 4.3.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/db:
+    dependencies:
+      '@neondatabase/serverless':
+        specifier: 1.1.0
+        version: 1.1.0
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@neondatabase/serverless@1.1.0)
+      ulid:
+        specifier: 3.0.2
+        version: 3.0.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.19.41
+      drizzle-kit:
+        specifier: 0.31.10
+        version: 0.31.10
       typescript:
         specifier: ^5
         version: 5.9.3
