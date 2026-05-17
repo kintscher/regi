@@ -289,11 +289,13 @@ Vollständige Recherche in `docs/data-sources.md`. MVP-Pflicht-Liste:
 1. `pnpm create next-app@latest regi-web --typescript --tailwind --app --src-dir=false`
 2. Neon-Projekt `regi` anlegen, Branches `main` + `dev`, Connection-Strings in `.env.local`
 3. Drizzle aufsetzen, Schema-Skelett für `publications`, `press_items`, `events`, `waste_dates`, `sources` anlegen, erste Migration
-4. **`/frontend-design` aufrufen** mit dem in Sektion 5 hinterlegten Kontext → Ergebnis nach `docs/design-system.md` und `app/globals.css`
-5. Eine erste Seite `/amtliches` mit Hardcoded-Mock-Daten aus der DB rendern – komplette Pipeline End-to-End validieren, im Stil des frisch erarbeiteten Design-Systems
+4. Eine erste Seite `/amtliches` mit Hardcoded-Mock-Daten aus der DB rendern – komplette Pipeline End-to-End validieren. **Noch kein Design-System:** neutral (Schwarz auf Weiss, System-Schrift); Zweck ist ausschliesslich Pipeline-Validierung, nicht Optik.
+5. **`/frontend-design` aufrufen** mit dem in Sektion 5 hinterlegten Kontext *und* der bereits stehenden `/amtliches`-Seite mit echtem Inhalt als Eingabe → Ergebnis nach `docs/design-system.md` und `app/globals.css`; danach `/amtliches` in diesem Stil überarbeiten
 6. **`/web-design-guidelines` und `/impeccable`** über das Ergebnis laufen lassen, iterieren
 7. Separates Repo `regi-ingest` mit Wrangler + Hono + Drizzle anlegen
 8. Erste Source `epublikation.ts` implementieren: Fetch + Zod + Upsert + Revalidate-POST
 9. Wenn Daten in der DB landen und auf der Seite erscheinen: zweite Quelle. Erst dann weiter polieren.
+
+> Schritt 4/5: `/frontend-design` wurde bewusst hinter die Pipeline-Validierung verschoben – das Design-System arbeitet mit echtem Inhalt statt mit Vermutungen (ADR 0003).
 
 **Reihenfolge ist nicht verhandelbar.** Erst Pipeline, dann Inhalt, dann Politur. Nicht umgekehrt.
