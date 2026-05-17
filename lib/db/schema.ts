@@ -40,13 +40,17 @@ export const publications = pgTable(
       .$defaultFn(() => ulid()),
     sourceId: text("source_id")
       .notNull()
-      .references(() => sources.id),
+      .references(() => sources.id, { onDelete: "restrict" }),
     externalId: text("external_id").notNull(),
     title: text("title").notNull(),
     body: text("body"),
     publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
     ingestedAt: timestamp("ingested_at", { withTimezone: true }).notNull().defaultNow(),
     rawHash: text("raw_hash").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (t) => [uniqueIndex("publications_source_external_uniq").on(t.sourceId, t.externalId)],
 );
