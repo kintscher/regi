@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@regi/db": "workspace:*"
+    "@regi/db": "workspace:*",
+    "zod": "^3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4",
