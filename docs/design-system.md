@@ -316,3 +316,47 @@ One source-native id (`events.group_id`, ADR 0012 amendment) drives the
 one-card-per-series collapse: ~150 raw occurrences render as ~10 rows. The
 ungrouped (`group_id` NULL) events appear individually. This is the template
 for any future *grouped* list (e.g. a recurring-meeting agenda).
+
+---
+
+## 11. Departure board — `.ov…` (added with the Transport source)
+
+Live departures are **columnar data**, not a feed, so this is the first
+deliberate non-list, non-strip primitive: a real semantic `<table>`. It still
+obeys the gazette grammar — horizontal hairlines only (no vertical rules, no
+cell borders), mono figures, sans prose, accent links-only.
+
+- **Semantics first.** `<table>` with a `.sr-only` `<caption>` (the table's
+  accessible name) and `<th scope="col">` headers in the quiet `.tag` voice.
+  `.sr-only` is a new **a11y utility** (the standard clip pattern) — not a
+  visual token; it also serves the future skip-link.
+- **`.ov`** — `table-layout: fixed`: the four mono columns (`.ov__c-line`,
+  `.ov__c-time`, `.ov__c-delay`, `.ov__c-plat`) have fixed widths so figures
+  align to the pixel (`tabular-nums`); Ziel takes the remainder and wraps
+  (`overflow-wrap: anywhere`, `hyphens: auto`) so long German destinations
+  never overflow. Rows separated by a `--rule` hairline, last row clean; the
+  header underlined with `--rule-strong` like `.page__head`.
+- **Delay is typographic, never chromatic.** The system is monochrome-warm and
+  `--accent` is links-only (§2); a yellow/green traffic-light was explicitly
+  rejected. Lateness is signalled by **ink weight**: on-time/unknown is a
+  quiet `--ink-meta` `--text-xs` («pünktlich» / «—»); a real delay is
+  `.ov__delay--late` — `+N′` in full `--ink`, weight 600, `--text-sm`.
+  Heavier ink = the alarm. This keeps the board readable as a gazette, not a
+  dashboard, and stays WCAG-robust without relying on colour to convey state.
+- **`.ov__status`** — the freshness line. `aria-live="polite"` wraps **only**
+  the absolute `<time>` (`.ov__stamp`, mono), which changes on the real 60 s
+  refresh; the 10 s-ticking «· vor X Sek.» (`.ov__rel`) is the aria-hidden
+  client child — a ticking counter in a live region is SR noise (same
+  trade-off as the weather `RelativeTime`).
+- **`.ov__colophon`** — same rule-topped footer shape as
+  `.weather__colophon`/`.event__colophon` (a third namespaced instance;
+  the shared-`.colophon` generalisation remains the noted, deliberate
+  not-en-passant refactor), plus a quiet `.ov__live` «Live, auf Abruf» note
+  (the on-demand marker, ADR 0011).
+- **Mobile < 39.99rem** drops the platform column only (`.ov__c-plat`),
+  mirroring how `.weather__params` / `.event__where` shed secondary data at
+  the same breakpoint; line · destination · time · delay remain.
+
+This is the template for any future *real-time tabular* source (traffic, air
+quality grids): a semantic table, mono columns, state by weight not hue,
+on-demand (ADR 0011) with a `.sr-only` caption and an `aria-live` freshness.
