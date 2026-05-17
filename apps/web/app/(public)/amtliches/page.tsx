@@ -1,6 +1,5 @@
-import { desc, eq } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { publications, sources } from "@/lib/db/schema";
+import { db, desc, eq } from "@regi/db";
+import { publications, sources } from "@regi/db/schema";
 
 // Reads the live Neon dev branch on every request. A tag-based caching
 // strategy follows with the ingestion worker (CLAUDE.md §4); this page exists
