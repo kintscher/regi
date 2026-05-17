@@ -1,6 +1,8 @@
 import { db, desc, eq } from "@regi/db";
 import { publications, sources } from "@regi/db/schema";
 import { unstable_cache } from "next/cache";
+import { getWeather } from "@/components/weather-widget/data";
+import { WeatherWidget } from "@/components/weather-widget/weather-widget";
 
 // Tag-based caching (CLAUDE.md §4): the list is cached and invalidated by the
 // ingest webhook (revalidateTag "source:epublikation" /
@@ -49,7 +51,9 @@ function hostOf(url: string): string | null {
 }
 
 export default async function AmtlichesPage() {
-  const items = await getNotices();
+  // Independent cache entries (tags source:epublikation* / source:weather);
+  // fetched in parallel so the weather strip never serialises behind the list.
+  const [items, weather] = await Promise.all([getNotices(), getWeather(1)]);
 
   const count = new Intl.NumberFormat("de-CH").format(items.length);
   // U+00A0 keeps the count glued to its noun (Swiss editorial typography).
@@ -61,6 +65,8 @@ export default async function AmtlichesPage() {
         <h1 className="page__title">Amtliche Mitteilungen</h1>
         <p className="page__meta">{countLabel}</p>
       </header>
+
+      <WeatherWidget data={weather} />
 
       {items.length === 0 ? (
         <div className="empty">

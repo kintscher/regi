@@ -237,3 +237,44 @@ content types add *fields within* the content column (e.g. an event time, a
 price in CHF) using the existing tokens — they do not introduce new colour,
 type or spacing scales. Any genuinely new primitive is added here first, then
 used. The system is the contract; pages are instances of it.
+
+---
+
+## 9. Weather strip — `.weather…` (added with the Existenz source)
+
+Not every source is a dated list. Current weather is a *state*, not a feed, so
+it gets the first non-list primitive: a **print-broadsheet weather box**, not a
+card. It still obeys the system — same tokens, same hairline rhythm, same
+mono/sans voices — and reuses `.tag` / `.ext` / `.empty` unchanged.
+
+- **`.weather`** — a block bounded by a single `--rule` hairline + `--space-6`
+  bottom margin. On `/amtliches` it sits between the masthead and the notices
+  `<ol>`; on `/wetter` it sits below the masthead. `.weather--empty` drops the
+  frame so the reused `.empty` panel reads normally when there is no data.
+- **`.weather__now`** — the primary reading line (flex, baseline-aligned):
+  - **`.weather__temp`** — the figure, Geist **Mono**, `--text-xl` (the scale
+    ceiling — no new token), `tabular-nums`, `--ink`. The temperature is the
+    one large element; hierarchy comes from the mono *voice* + size, not from
+    `--accent`. **Accent is never used for a value** — it stays links-only.
+  - **`.weather__unit`** — small superior `°C` in `--ink-meta` (broadsheet
+    figure/unit pairing).
+  - **`.weather__desc`** — terse sans descriptor, `--ink-muted`, derived only
+    from measured fields (no invented sky condition).
+  - **`.weather__time`** — trailing mono `--ink-meta` stamp: a machine-readable
+    `<time datetime>` (the SSR source of truth, formatted CH, `Europe/Zurich`
+    pinned) plus a tiny `'use client'` `vor X …` augmentation that starts empty
+    and fills post-mount (no hydration mismatch; absolute time stands without
+    JS).
+- **`.weather__params`** — secondary `<dl>` of figures (Feuchte, Wind+Böen,
+  Luftdruck, Niederschlag): `dt` in the `.tag` voice, `dd` mono `tabular-nums`.
+  **Hidden < 40rem** (same `39.99rem` breakpoint as the `.notice` gutter
+  collapse): mobile shows only temp + descriptor + time by product decision.
+- **`.weather__foot`** — `.tag` (mandatory «Quelle: MeteoSchweiz» attribution,
+  legally required) + `.ext` external link, exactly like `.notice__foot`.
+- **`/wetter` log** reuses `.notices` / `.notice` / `.notice__date` unchanged;
+  only `.weather__logline` (one mono `tabular-nums` row per reading) and
+  `.weather__colophon` (rule-topped attribution footer) are new. This keeps
+  `/wetter` a visual sibling of `/amtliches`.
+
+The strip is the template for any future *state* widget (ÖV live board, air
+quality): a bounded block, mono figures, sans labels, accent links-only.
