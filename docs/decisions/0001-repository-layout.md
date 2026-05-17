@@ -4,7 +4,13 @@ Date: 2026-05-17
 
 ## Status
 
-Accepted
+Superseded by [ADR 0007](0007-monorepo-pnpm-workspaces.md) (2026-05-17).
+
+The original decision (separate `regi-web` / `regi-ingest` repos, no monorepo
+tooling) is kept verbatim below as accurate history. ADR 0007 reverses the
+"separate repos / no monorepo tooling" stance; ADR 0008 covers the shared
+`@regi/db` package that replaces the hand-synchronised cross-repo contract
+noted under *Consequences*.
 
 ## Context
 

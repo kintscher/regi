@@ -12,3 +12,8 @@ if (!databaseUrl) {
 const client = neon(databaseUrl);
 
 export const db = drizzle(client, { schema });
+
+// Re-exported so consumers (apps/web) never import drizzle-orm directly
+// (ADR 0008, decision D-a). Typed query helpers will later supersede this —
+// see the "extract typed query functions into packages/db" follow-up issue.
+export { desc, eq } from "drizzle-orm";

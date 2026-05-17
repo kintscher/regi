@@ -22,8 +22,9 @@ trail, and reproducibility.
 ## Decision
 
 All schema changes go through `pnpm db:generate` (writes SQL to
-`lib/db/migrations/` plus `meta/`) followed by `pnpm db:migrate`. `drizzle-kit
-push` is never used against any branch. `db:studio` is read/debug only.
+`packages/db/migrations/` plus `meta/`) followed by `pnpm db:migrate`.
+`drizzle-kit push` is never used against any branch. `db:studio` is read/debug
+only.
 
 Migrations run on the **unpooled** connection (`DATABASE_URL_UNPOOLED`), see
 ADR 0005. The journal lives in a separate `drizzle` schema

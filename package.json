@@ -1,36 +1,20 @@
 {
-  "name": "regi-web",
+  "name": "regi",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "web": "pnpm --filter @regi/web",
+    "typecheck": "pnpm -r typecheck",
     "lint": "biome check",
     "format": "biome check --write",
-    "prepare": "git config core.hooksPath .githooks || true",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "node --env-file=.env.local scripts/seed-mock.mts"
-  },
-  "dependencies": {
-    "@neondatabase/serverless": "1.1.0",
-    "drizzle-orm": "0.45.2",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "ulid": "3.0.2"
+    "db:generate": "pnpm --filter @regi/db generate",
+    "db:migrate": "pnpm --filter @regi/db migrate",
+    "db:studio": "pnpm --filter @regi/db studio",
+    "db:seed": "pnpm --filter @regi/db seed",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "drizzle-kit": "0.31.10",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
