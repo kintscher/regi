@@ -1,5 +1,6 @@
 import type { Env } from "../env";
 import { REVALIDATE_TAG, runEpublikation, SLUG } from "./epublikation";
+import { SLUG as EVENTFROG_SLUG, REVALIDATE_TAG as EVENTFROG_TAG, runEventfrog } from "./eventfrog";
 import {
   runExistenzWeather,
   SLUG as WEATHER_SLUG,
@@ -19,4 +20,5 @@ export interface IngestSource {
 export const sources: IngestSource[] = [
   { slug: SLUG, revalidateTag: REVALIDATE_TAG, run: runEpublikation },
   { slug: WEATHER_SLUG, revalidateTag: WEATHER_TAG, run: runExistenzWeather },
+  { slug: EVENTFROG_SLUG, revalidateTag: EVENTFROG_TAG, run: runEventfrog },
 ];
