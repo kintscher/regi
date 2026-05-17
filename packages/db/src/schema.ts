@@ -1,4 +1,4 @@
-import { pgTable, real, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, real, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { ulid } from "ulid";
 
 /**
@@ -89,4 +89,58 @@ export const weatherObservations = pgTable(
       .$onUpdate(() => new Date()),
   },
   (t) => [uniqueIndex("weather_obs_station_observed_uniq").on(t.stationCode, t.observedAt)],
+);
+
+/**
+ * Public events from the Eventfrog Public API. `description` holds a short
+ * teaser (shortDescription.de, ≤500 chars, app-enforced) — NOT the full HTML
+ * body: Eventfrog is event data offered for re-publication, so a teaser is
+ * permissible, but full-text/HTML is deliberately not cached (ADR 0012;
+ * contrast ADR 0004's no-body press rule). Location is denormalized in v1:
+ * Eventfrog references locations by id (a separate resource), so location_name
+ * comes from the per-event alias when present and coordinates stay null until
+ * a later locationIds-resolve (ADR 0012, v1 limit).
+ *
+ * (source_id, external_id) is unique so ingestion can upsert idempotently.
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => ulid()),
+    sourceId: text("source_id")
+      .notNull()
+      .references(() => sources.id, { onDelete: "restrict" }),
+    externalId: text("external_id").notNull(),
+    // Source-native group identifier (Eventfrog groupId): recurring
+    // occurrences of the same event share it. Nullable — the upstream "0"
+    // sentinel ("not in a group") is normalised to NULL at ingest, which is
+    // semantically correct for "no grouping relation" (ADR 0012 amendment,
+    // "Source-Native Identifiers"). Drives the /veranstaltungen per-series UI.
+    groupId: text("group_id"),
+    title: text("title").notNull(),
+    description: text("description"),
+    startAt: timestamp("start_at", { withTimezone: true }).notNull(),
+    endAt: timestamp("end_at", { withTimezone: true }),
+    locationName: text("location_name"),
+    locationLat: real("location_lat"),
+    locationLon: real("location_lon"),
+    url: text("url").notNull(),
+    organizerName: text("organizer_name"),
+    rubricId: integer("rubric_id"),
+    imageUrl: text("image_url"),
+    rawHash: text("raw_hash").notNull(),
+    ingestedAt: timestamp("ingested_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex("events_source_external_uniq").on(t.sourceId, t.externalId),
+    // /veranstaltungen groups by series; index the grouping key up front
+    // rather than as a later perf fix.
+    index("events_source_group_idx").on(t.sourceId, t.groupId),
+  ],
 );

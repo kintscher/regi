@@ -22,6 +22,20 @@
       "when": 1779045327819,
       "tag": "0002_cultured_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779047497505,
+      "tag": "0003_chief_kulan_gath",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779048558925,
+      "tag": "0004_peaceful_gertrude_yorkes",
+      "breakpoints": true
     }
   ]
 }
