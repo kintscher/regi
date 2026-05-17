@@ -98,16 +98,37 @@ identity); `meta.updateDate` is included so genuine upstream corrections do flip
 the hash. Implemented as a documented `canonicalItemFields()` helper with an
 inline comment pointing here.
 
-**Plausibility cap (decision "Cap-1").** The ePublikation read API silently
-returns the *global* dataset (~2.7M) when a filter parameter is unrecognised
-(verified, see §11.6 plan / ADR 0010). The expected scoped result
-(`tenant=kabzh` + `cantons=ZH` + a date window + client-side
-`municipalityId === "96"`) is hundreds of items at most. The worker therefore
-treats `total > 5000` as a **degraded run**: it logs an error, does **not**
-persist, and does **not** advance `sources.last_synced_at`, so a broken filter
-cannot poison the table or the freshness signal. The threshold lives in
-`sources/epublikation/constants.ts` (`PLAUSIBILITY_MAX_TOTAL = 5000`) with a
-comment citing this ADR — never a magic number at a call site.
+**Plausibility caps (decisions "Cap-1" global, "Cap-2" per-source).** The
+ePublikation read API silently returns the *global* dataset (~2.7M) when a
+filter parameter is unrecognised (verified, see §11.6 plan / ADR 0010). A
+degraded run logs an error, does **not** persist, and does **not** advance
+`sources.last_synced_at`, so a broken filter cannot poison the table or the
+freshness signal. Two layered thresholds:
+
+- **Cap-1 (global, `PLAUSI_CAP = 5000`)** — the worst-case sanity guard for
+  unknown API drift, conceptually applicable to *any* source. Anything beyond
+  this is unambiguously the unfiltered fall-through.
+- **Cap-2 (per-source, ePublikation `PLAUSI_TOTAL_MAX = 1000`)** — an
+  empirically-grounded bound. Verified 2026-05-17: the production query
+  `keyword=Regensdorf&cantons=ZH&publicationStates=PUBLISHED` over a 30-day
+  window returns `total = 168` (191 without `cantons`). 1000 leaves generous
+  headroom for spikes yet trips long before Cap-1 and far before the global
+  fall-through, so it is the operative degraded gate for this source (it
+  subsumes Cap-1 here, 1000 < 5000; both are kept so the global guarantee
+  stays explicit). `MAX_PAGES = 10` additionally hard-caps the pagination
+  loop (rate-discipline, ADR 0010).
+
+Future sources add their **own** Cap-2 to their `constants.ts` rather than
+rewriting the global Cap-1. Both live in
+`apps/ingest/src/sources/epublikation/constants.ts` with comments citing this
+ADR and the verification date — never a magic number at a call site.
+
+> Note: an earlier draft of this ADR and the §11.6 plan assumed a
+> `tenant=kabzh&cantons=ZH` query yielding "hundreds of items". Live
+> verification disproved that (`total = 7308`/30d, ~2 Regensdorf hits per 500
+> rows). The source query is `keyword=Regensdorf&cantons=ZH` with a
+> client-side `registrationOffice.municipalityId === "96"` post-filter; the
+> Cap values above reflect the verified query. See the amendment note.
 
 **Source initialisation.** No separate seed script. Each run calls an
 idempotent `ensureSource()` (`INSERT … ON CONFLICT (slug) DO UPDATE SET
@@ -144,3 +165,21 @@ contradicts this ADR's own anti-`process.env`-at-import-time stance. The Db-2
 text and the worker-layout block above are written to the amended (subpath)
 form; this note records the change. No code had shipped against the index
 form.
+
+## Amendment (2026-05-17, Sub-Schritt 3, pre-implementation)
+
+"Cap-1" was split into **Cap-1 (global)** + **Cap-2 (per-source)** after live
+verification disproved the assumed source query. The original draft assumed
+`tenant=kabzh&cantons=ZH` returns "hundreds of items"; measured `total` is
+7308 for a 30-day window, with only ~2 Regensdorf (`municipalityId === "96"`)
+rows per 500, so that query is both above any sane single cap and too sparse
+to page. The verified query is `keyword=Regensdorf&cantons=ZH&
+publicationStates=PUBLISHED` (`total = 168`/30d; AND-combination and the
+`cantons=BE` control confirmed) with the same client-side `municipalityId ===
+"96"` post-filter. `keyword` is server-side full text; if it is empty under
+the defense-in-depth `cantons=ZH` the source falls back to keyword-only (the
+post-filter still guarantees Regensdorf precision). The Plausibility section
+above is written in the amended form. Constants: `PLAUSI_CAP = 5000`
+(Cap-1), `PLAUSI_TOTAL_MAX = 1000`, `MAX_PAGES = 10` (Cap-2). The residual
+keyword-full-text gap is tracked as a follow-up (registrationOffices filter
+verification). No code had shipped against the old query.
