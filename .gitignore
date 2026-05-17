@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# neon cli local context (org/project ids — never commit)
+.neon
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
