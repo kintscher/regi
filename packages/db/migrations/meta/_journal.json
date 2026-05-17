@@ -15,6 +15,13 @@
       "when": 1779020697746,
       "tag": "0001_chubby_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779045327819,
+      "tag": "0002_cultured_lyja",
+      "breakpoints": true
     }
   ]
 }
