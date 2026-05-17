@@ -1,17 +1,15 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import * as schema from "./schema";
+import { createDb } from "./client";
 
-// Pooled connection (DATABASE_URL). The app reads only this; migrations use the
-// unpooled URL via drizzle.config.ts. See ADR 0005.
+// Module-load instance for the app: pooled DATABASE_URL (ADR 0005). apps/web
+// imports this; migrations use the unpooled URL via drizzle.config.ts. The
+// Worker must NOT import from here — this top-level read throws without an
+// ambient process.env. It uses `@regi/db/client` instead. See ADR 0009 (Db-2).
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error("DATABASE_URL is not set");
 }
 
-const client = neon(databaseUrl);
-
-export const db = drizzle(client, { schema });
+export const db = createDb(databaseUrl);
 
 // Re-exported so consumers (apps/web) never import drizzle-orm directly
 // (ADR 0008, decision D-a). Typed query helpers will later supersede this —
