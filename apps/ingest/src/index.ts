@@ -1,21 +1,30 @@
 import type { Env } from "./env";
+import { postRevalidate } from "./lib/revalidate";
 import { sources } from "./sources/registry";
+import type { SourceRunResult } from "./sources/types";
+
+type RunOutcome = { slug: string; ok: boolean; result?: SourceRunResult };
 
 // Run every registered source in isolation: one failing source must never
-// abort the cron run (CLAUDE.md §4). The registry is empty until the first
-// source lands in Sub-Schritt 3, so this is a no-op for now.
-async function runAll(env: Env): Promise<{ slug: string; ok: boolean }[]> {
-  const results: { slug: string; ok: boolean }[] = [];
+// abort the cron run (CLAUDE.md §4). A clean run that actually wrote rows
+// invalidates that source's cache tag — degraded or zero-persist runs do not,
+// avoiding needless Vercel re-renders (ADR 0009).
+async function runAll(env: Env): Promise<RunOutcome[]> {
+  const outcomes: RunOutcome[] = [];
   for (const source of sources) {
     try {
-      await source.run(env);
-      results.push({ slug: source.slug, ok: true });
+      const result = await source.run(env);
+      console.log(`source ${source.slug}:`, result);
+      if (!result.degraded && result.persisted > 0) {
+        await postRevalidate(env.SITE_URL, env.INGEST_REVALIDATE_SECRET, [source.revalidateTag]);
+      }
+      outcomes.push({ slug: source.slug, ok: true, result });
     } catch (error) {
       console.error(`source ${source.slug} failed:`, error);
-      results.push({ slug: source.slug, ok: false });
+      outcomes.push({ slug: source.slug, ok: false });
     }
   }
-  return results;
+  return outcomes;
 }
 
 export default {
