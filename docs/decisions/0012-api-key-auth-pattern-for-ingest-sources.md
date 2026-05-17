@@ -139,3 +139,31 @@ permissible — but the full HTML body is deliberately not stored. Location is
   until re-provisioned. Mitigated by the loud `degraded` log and the
   unadvanced `last_synced_at` (the `/quellen` freshness signal makes a stale
   source visible); accepted for v1.
+
+## Amendment (2026-05-17, Source 2, post-verification): Source-Native Identifiers
+
+Beyond `external_id` (the primary unique identifier per item), some sources
+provide additional source-native identifiers that reflect domain structure
+(e.g. Eventfrog's `groupId` linking recurring event occurrences). The
+ingestion layer persists these faithfully — they enable presentation-layer
+logic (grouping, deduplication, navigation) without forcing the ingest layer
+to interpret domain semantics.
+
+Concrete rule: if a source provides a structured identifier that is stable
+across related items, persist it as a **nullable text column**; an upstream
+"no relation" sentinel is normalised to `NULL` at ingest. Include it in the
+canonical `raw_hash` projection so a source-side change triggers an update.
+Index it (`(source_id, <id>)`) if presentation queries will group/filter by
+it. This avoids reverse-engineering grouping heuristics from text fields
+(fragile and not source-correct).
+
+First concrete application — **Eventfrog `groupId`**: verified live + spec
+2026-05-17 to be a string ("64-bit int in string format"), single-level, with
+the sentinel `"0"` for "not in a group" (147 events / zip 8105+8106 → 4
+distinct values; 138 share one series id). Persisted as `events.group_id`
+(nullable; `"0"`/empty → `NULL`), added to the canonical `raw_hash`
+projection (a one-time idempotent re-upsert backfills existing rows), indexed
+`events_source_group_idx (source_id, group_id)`. It drives the
+`/veranstaltungen` per-series UI (one card per `group_id`, ungrouped events
+shown individually). Schema added via migration `0004` (additive: `ADD COLUMN`
++ `CREATE INDEX`, no change to other tables).
