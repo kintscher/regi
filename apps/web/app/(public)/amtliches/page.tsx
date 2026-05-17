@@ -1,11 +1,38 @@
 import { db, desc, eq } from "@regi/db";
 import { publications, sources } from "@regi/db/schema";
+import { unstable_cache } from "next/cache";
 
-// Reads the live Neon dev branch on every request. A tag-based caching
-// strategy follows with the ingestion worker (CLAUDE.md §4); this page exists
-// only to validate the RSC → Drizzle → Neon pipeline end-to-end (§11.4) and is
-// now the design-system master template (docs/design-system.md, ADR 0003).
-export const dynamic = "force-dynamic";
+// Tag-based caching (CLAUDE.md §4): the list is cached and invalidated by the
+// ingest webhook (revalidateTag "source:epublikation" /
+// "source:epublikation-test"), with a 30-minute time-based safety net if a
+// webhook is missed. Design-system master template (docs/design-system.md,
+// ADR 0003).
+const getNotices = unstable_cache(
+  async () => {
+    // leftJoin sources for the Source-Tag (disambiguation) and External-Link.
+    // No per-item deep-link column yet, so the link targets the source
+    // homepage; per-item URLs arrive later (docs/design-system.md).
+    const rows = await db
+      .select({
+        id: publications.id,
+        title: publications.title,
+        body: publications.body,
+        publishedAt: publications.publishedAt,
+        sourceName: sources.name,
+        sourceUrl: sources.url,
+      })
+      .from(publications)
+      .leftJoin(sources, eq(publications.sourceId, sources.id))
+      .orderBy(desc(publications.publishedAt))
+      .limit(50);
+    // unstable_cache serialises via JSON; return publishedAt as an ISO string
+    // so it survives the cache boundary unambiguously (a Date round-trips to a
+    // string anyway — making it explicit avoids a latent bug).
+    return rows.map((r) => ({ ...r, publishedAt: r.publishedAt.toISOString() }));
+  },
+  ["amtliches/list/v1"],
+  { tags: ["source:epublikation", "source:epublikation-test"], revalidate: 1800 },
+);
 
 const dateFormat = new Intl.DateTimeFormat("de-CH", {
   day: "2-digit",
@@ -22,22 +49,7 @@ function hostOf(url: string): string | null {
 }
 
 export default async function AmtlichesPage() {
-  // leftJoin sources for the Source-Tag (disambiguation) and External-Link.
-  // There is no per-item deep-link column yet, so the link targets the source
-  // homepage; per-item URLs arrive with real ingestion (docs/design-system.md).
-  const items = await db
-    .select({
-      id: publications.id,
-      title: publications.title,
-      body: publications.body,
-      publishedAt: publications.publishedAt,
-      sourceName: sources.name,
-      sourceUrl: sources.url,
-    })
-    .from(publications)
-    .leftJoin(sources, eq(publications.sourceId, sources.id))
-    .orderBy(desc(publications.publishedAt))
-    .limit(50);
+  const items = await getNotices();
 
   const count = new Intl.NumberFormat("de-CH").format(items.length);
   // U+00A0 keeps the count glued to its noun (Swiss editorial typography).
@@ -64,8 +76,8 @@ export default async function AmtlichesPage() {
             return (
               <li key={item.id}>
                 <article className="notice">
-                  <time className="notice__date" dateTime={item.publishedAt.toISOString()}>
-                    {dateFormat.format(item.publishedAt)}
+                  <time className="notice__date" dateTime={item.publishedAt}>
+                    {dateFormat.format(new Date(item.publishedAt))}
                   </time>
                   <div className="notice__main">
                     <h2 className="notice__title">{item.title}</h2>
