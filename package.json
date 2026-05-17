@@ -12,7 +12,8 @@
     "prepare": "git config core.hooksPath .githooks || true",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "node --env-file=.env.local scripts/seed-mock.mts"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.1.0",
