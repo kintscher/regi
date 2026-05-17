@@ -1,11 +1,69 @@
 #!/bin/sh
 # Versioned pre-commit gate. Wired via `core.hooksPath` (package.json "prepare").
-# Scope per project decision: typecheck + Biome from day one. `pnpm test` is
-# added here once Vitest exists.
+# Dependency-free by design — no husky/lefthook (deliberate setup approach).
+# Scope: typecheck + Biome from day one. `pnpm test` is added here once Vitest
+# exists.
 set -e
 
-echo "pre-commit › typecheck"
-pnpm typecheck
+# GUI git clients, non-login shells and IDE commits often run hooks with a
+# minimal PATH that has no nvm/corepack init, so a bare `pnpm` fails. Resolve it
+# explicitly and prepend its bin dir to PATH — pnpm is a Node script, so the
+# sibling `node` must be reachable too. Sets PNPM_CMD; not run in a subshell so
+# the PATH change persists. Order: existing PATH -> corepack -> nvm -> installs.
+PNPM_CMD=""
+resolve_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    PNPM_CMD="pnpm"
+    return 0
+  fi
+
+  if command -v corepack >/dev/null 2>&1; then
+    PNPM_CMD="corepack pnpm"
+    return 0
+  fi
+
+  nvm_dir="${NVM_DIR:-$HOME/.nvm}"
+  if [ -d "$nvm_dir/versions/node" ]; then
+    if [ -x "$nvm_dir/current/bin/pnpm" ]; then
+      PATH="$nvm_dir/current/bin:$PATH"
+      PNPM_CMD="pnpm"
+      return 0
+    fi
+    for bin in "$nvm_dir"/versions/node/*/bin; do
+      [ -d "$bin" ] || continue
+      if [ -x "$bin/pnpm" ]; then
+        PATH="$bin:$PATH"
+        PNPM_CMD="pnpm"
+        return 0
+      fi
+      if [ -x "$bin/corepack" ]; then
+        PATH="$bin:$PATH"
+        PNPM_CMD="corepack pnpm"
+        return 0
+      fi
+    done
+  fi
+
+  for dir in /opt/homebrew/bin /usr/local/bin "$HOME/.local/share/pnpm"; do
+    if [ -x "$dir/pnpm" ]; then
+      PATH="$dir:$PATH"
+      PNPM_CMD="pnpm"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+if ! resolve_pnpm; then
+  echo "pre-commit: pnpm not found on PATH, via corepack, nvm or common installs." >&2
+  echo "pre-commit: install pnpm or activate it via 'corepack enable', then retry." >&2
+  exit 1
+fi
+export PATH
+
+echo "pre-commit › typecheck ($PNPM_CMD)"
+$PNPM_CMD typecheck
 
 echo "pre-commit › biome"
-pnpm lint
+$PNPM_CMD lint
