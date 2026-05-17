@@ -1,0 +1,11 @@
+#!/bin/sh
+# Versioned pre-commit gate. Wired via `core.hooksPath` (package.json "prepare").
+# Scope per project decision: typecheck + Biome from day one. `pnpm test` is
+# added here once Vitest exists.
+set -e
+
+echo "pre-commit › typecheck"
+pnpm typecheck
+
+echo "pre-commit › biome"
+pnpm lint
