@@ -48,15 +48,21 @@ when **any** of these triggers is hit, whichever comes first:
 Until then "later" is concrete, not open-ended. Adding Hono is a one-topic PR
 with its own ADR amendment.
 
-**`@regi/db` factory (decision "Db-2").** `@regi/db` gains an additive export
-`createDb(connectionString: string)` returning a configured Drizzle instance.
-The argument is the connection **string only** — never the Worker `env` object
-— so `@regi/db` stays platform-agnostic (no Cloudflare types leak in). The
-existing default `db` export and operator re-exports (ADR 0008 "D-a") are
-unchanged: `apps/web` is untouched. `apps/ingest/src/lib/db.ts` calls
-`createDb(env.DATABASE_URL)` inside the handler, where `env` exists. This also
-unblocks the typed-query-function follow-up (ADR 0008) without further API
-churn.
+**`@regi/db` factory (decision "Db-2").** `@regi/db` gains an additive,
+**side-effect-free** export `createDb(connectionString: string)` returning a
+configured Drizzle instance. The argument is the connection **string only** —
+never the Worker `env` object — so `@regi/db` stays platform-agnostic (no
+Cloudflare types leak in). It lives at its own subpath **`@regi/db/client`**
+(`src/client.ts`), not at the package index: `@regi/db` (index) reads
+`process.env.DATABASE_URL` at the top level and throws if unset, and JS module
+semantics run that on *any* import from the index — including the Worker's.
+The subpath is the side-effect-free entry the Worker imports; it follows the
+existing subpath-export pattern of ADR 0008 (`./schema`). The index keeps its
+eager `db` export and the operator re-exports (ADR 0008 "D-a") and internally
+builds `db` via `createDb`: `apps/web` is untouched. `apps/ingest/src/lib/db.ts`
+imports `createDb` from `@regi/db/client` and calls `createDb(env.DATABASE_URL)`
+inside the handler, where `env` exists. This also unblocks the
+typed-query-function follow-up (ADR 0008) without further API churn.
 
 **Worker layout.**
 
@@ -68,7 +74,7 @@ apps/ingest/src/
     index.ts            # fetch → filter → map → upsert → revalidate
     schema.ts           # Zod (Worker-only: validates the external API shape)
     constants.ts        # tunables, each citing this ADR
-  lib/db.ts             # createDb(env.DATABASE_URL)
+  lib/db.ts             # createDb(env.DATABASE_URL) from "@regi/db/client"
   lib/r2.ts             # content-addressed raw audit write
   lib/revalidate.ts     # POST { tags } → SITE_URL/api/revalidate
 ```
@@ -126,3 +132,15 @@ separate slug `epublikation-test` (seed-mock, unchanged).
   millions of rows.
 - `nodejs_compat` ties the worker to that Workers feature; acceptable — it is a
   stable platform compat flag, not a framework abstraction.
+
+## Amendment (2026-05-17, same day, pre-implementation)
+
+Decision "Db-2" originally placed `createDb` on the package index
+(`@regi/db`). During implementation it was relocated to the dedicated
+side-effect-free subpath **`@regi/db/client`** (`src/client.ts`): importing
+anything from the index runs its top-level `process.env.DATABASE_URL` read
+and throw (JS module semantics), which a Worker import would trigger and which
+contradicts this ADR's own anti-`process.env`-at-import-time stance. The Db-2
+text and the worker-layout block above are written to the amended (subpath)
+form; this note records the change. No code had shipped against the index
+form.
