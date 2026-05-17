@@ -18,15 +18,20 @@
 
 **Sprache:** UI ausschliesslich Hochdeutsch (CH-Schreibweise: «ss» statt «ß», Anführungszeichen «», Datumsformat TT.MM.JJJJ, Zeit HH.MM, Währung CHF mit Tausendertrennzeichen). Code, Kommentare, Commits, Issues: Englisch.
 
-**Repos:**
-- `regi-web` – Next.js Frontend (dieses Repo)
-- `regi-ingest` – Cloudflare Workers für Datenbezug (separates Repo)
+**Repo:** Ein pnpm-Monorepo (`regi`, dieses Repo):
+- `apps/web` (`@regi/web`) – Next.js Frontend
+- `apps/ingest` (`@regi/ingest`) – Cloudflare Workers für Datenbezug (noch nicht angelegt, §11)
+- `packages/db` (`@regi/db`) – geteiltes Drizzle-Schema & Neon-Client
+
+> Bis ADR 0007 waren `regi-web` und `regi-ingest` als getrennte Repos geplant
+> (ADR 0001). ADR 0007 hat das durch dieses Monorepo abgelöst; ADR 0008
+> beschreibt das geteilte `@regi/db`-Paket.
 
 ---
 
 ## 2. Tech-Stack (verbindlich)
 
-### Frontend (`regi-web`)
+### Frontend (`apps/web`)
 - **Next.js** App Router (aktuelle stable Major), TypeScript im Strict Mode
 - **React** mit Server Components als Default
 - **Tailwind CSS** v4 (CSS-first, keine `tailwind.config.ts`-Bloat)
@@ -35,7 +40,7 @@
 - **Zod** für Schema-Validierung externer Daten
 - Hosting: **Vercel** (Hobby-Tier reicht initial)
 
-### Ingestion (`regi-ingest`)
+### Ingestion (`apps/ingest`)
 - **Cloudflare Workers** + **Hono** + **Drizzle** (Neon HTTP-Driver)
 - Cron Triggers pro Quelle, granulare Schedules
 - Worker triggert Next.js Webhook `/api/revalidate` mit Tags nach jedem Lauf
@@ -60,39 +65,46 @@
 ## 3. Repo-Struktur
 
 ```
-regi-web/
-├── app/
-│   ├── (public)/
-│   │   ├── page.tsx             # Heute-Übersicht
-│   │   ├── amtliches/           # ePublikation-Mitteilungen
-│   │   ├── presse/              # Lokal-/Regional-Presse
-│   │   ├── veranstaltungen/     # Eventfrog
-│   │   ├── ov/                  # ÖV-Abfahrten Live
-│   │   ├── abfall/              # Abfallkalender
-│   │   ├── wetter/              # Wetter + Luftqualität
-│   │   ├── karte/               # Interaktive Karte
-│   │   ├── statistik/           # Gemeindeporträt-Daten
-│   │   └── ueber/               # Kolophon, Quellen, Lizenzen
-│   ├── api/
-│   │   ├── revalidate/route.ts  # Webhook vom Ingestion-Worker
-│   │   └── og/[slug]/route.tsx  # Dynamic OG Images
-│   └── layout.tsx
-├── components/
-│   ├── primitives/              # Eigene Bausteine (nicht shadcn)
-│   ├── feed/                    # NewsCard, FilterBar, etc.
-│   └── widgets/                 # Wetter, ÖV, Abfall
-├── lib/
-│   ├── db/
-│   │   ├── schema.ts            # Drizzle
-│   │   └── queries/             # Typed query functions
-│   ├── sources/                 # TS-Interfaces der externen Quellen
-│   └── format/                  # CH-Formatters (date, currency, …)
-├── docs/
-│   ├── data-sources.md          # Recherche-Bericht
-│   ├── design-system.md         # Wird vom frontend-design-Skill befüllt
-│   └── decisions/               # ADRs
-└── public/
+regi/                               # pnpm-Monorepo (ein Git-Repo)
+├── apps/
+│   ├── web/                        # Next.js (@regi/web)
+│   │   ├── app/
+│   │   │   ├── (public)/
+│   │   │   │   ├── page.tsx              # Heute-Übersicht       (geplant)
+│   │   │   │   ├── amtliches/            # ePublikation          (live)
+│   │   │   │   ├── presse/               # Presse                (geplant)
+│   │   │   │   ├── veranstaltungen/      # Eventfrog             (geplant)
+│   │   │   │   ├── ov/                   # ÖV-Abfahrten          (geplant)
+│   │   │   │   ├── abfall/               # Abfallkalender        (geplant)
+│   │   │   │   ├── wetter/               # Wetter + Luft         (geplant)
+│   │   │   │   ├── karte/                # Karte                 (geplant)
+│   │   │   │   ├── statistik/            # Gemeindeporträt       (geplant)
+│   │   │   │   └── ueber/                # Kolophon/Quellen      (geplant)
+│   │   │   ├── api/
+│   │   │   │   ├── revalidate/route.ts   # Ingest-Webhook        (geplant)
+│   │   │   │   └── og/[slug]/route.tsx   # OG Images             (geplant)
+│   │   │   └── layout.tsx
+│   │   ├── components/             # eigene Bausteine, nicht shadcn  (geplant)
+│   │   ├── lib/{sources,format}/   # Quell-Interfaces, CH-Formatters (geplant)
+│   │   ├── public/
+│   │   └── next.config.ts · tsconfig.json
+│   └── ingest/                     # Cloudflare Workers (@regi/ingest) — §11, geplant
+├── packages/
+│   └── db/                         # @regi/db — geteilt von web & ingest
+│       ├── src/{index,schema}.ts   # db-Instanz + Operator-Re-Exports; Drizzle-Schema
+│       ├── migrations/             # drizzle-kit out
+│       ├── scripts/seed-mock.mts   # Dev-Seed (Pipeline-Validierung)
+│       └── drizzle.config.ts · tsconfig.json
+├── docs/                           # geteilt: data-sources.md, design-system.md,
+│                                   #          decisions/ (ADRs 0001 … 0008)
+├── .githooks/pre-commit            # typecheck + Biome (core.hooksPath)
+├── pnpm-workspace.yaml · tsconfig.base.json · biome.json
+└── package.json                    # privat; Proxy-Scripts: pnpm web …, pnpm db:* …
 ```
+
+> `components/`, `lib/sources/`, `lib/format/` sind noch **nicht angelegt** —
+> sie entstehen mit den jeweiligen Features. Typisierte Query-Funktionen
+> wandern nach `packages/db` (ADR 0008; Follow-up-Issue).
 
 ---
 
@@ -239,7 +251,10 @@ Vollständige Recherche in `docs/data-sources.md`. MVP-Pflicht-Liste:
 - `/autofix-pr` darf zum Schluss laufen, ersetzt aber keine inhaltliche Review.
 
 ### Vor jedem Commit
-- `pnpm typecheck && pnpm lint && pnpm test`
+- `pnpm typecheck && pnpm lint` — Root-Scripts: `typecheck` fächert via
+  `pnpm -r` über alle Workspaces, `lint` ist repo-weites Biome. `pnpm test`
+  kommt dazu, sobald Vitest existiert. Der versionierte Pre-Commit-Hook
+  (`.githooks/`, `core.hooksPath`) erzwingt typecheck + Biome bereits automatisch.
 - Bei UI-Änderung: `/web-design-guidelines` über die geänderten Files, Findings im PR adressieren.
 
 ---
@@ -284,18 +299,22 @@ Vollständige Recherche in `docs/data-sources.md`. MVP-Pflicht-Liste:
 
 ---
 
-## 11. Sofortige nächste Schritte (zum Projektstart)
+## 11. Projektstand & nächste Schritte
 
-1. `pnpm create next-app@latest regi-web --typescript --tailwind --app --src-dir=false`
-2. Neon-Projekt `regi` anlegen, Branches `main` + `dev`, Connection-Strings in `.env.local`
-3. Drizzle aufsetzen, Schema-Skelett für `publications`, `press_items`, `events`, `waste_dates`, `sources` anlegen, erste Migration
-4. Eine erste Seite `/amtliches` mit Hardcoded-Mock-Daten aus der DB rendern – komplette Pipeline End-to-End validieren. **Noch kein Design-System:** neutral (Schwarz auf Weiss, System-Schrift); Zweck ist ausschliesslich Pipeline-Validierung, nicht Optik.
-5. **`/frontend-design` aufrufen** mit dem in Sektion 5 hinterlegten Kontext *und* der bereits stehenden `/amtliches`-Seite mit echtem Inhalt als Eingabe → Ergebnis nach `docs/design-system.md` und `app/globals.css`; danach `/amtliches` in diesem Stil überarbeiten
-6. **`/web-design-guidelines` und `/impeccable`** über das Ergebnis laufen lassen, iterieren
-7. Separates Repo `regi-ingest` mit Wrangler + Hono + Drizzle anlegen
-8. Erste Source `epublikation.ts` implementieren: Fetch + Zod + Upsert + Revalidate-POST
-9. Wenn Daten in der DB landen und auf der Seite erscheinen: zweite Quelle. Erst dann weiter polieren.
+### ✅ Erledigt
+1. Bootstrap Next.js + Tailwind (`apps/web`)
+2. Neon-Projekt `regi`, Branches `main` + `dev`, Connection-Strings in `.env.local`
+3. Drizzle aufgesetzt, Schema-Skelett `sources` + `publications`, erste Migrationen
+4. `/amtliches` rendert Mock-Daten aus Neon via RSC — Pipeline end-to-end validiert
+5. Design-System via `/frontend-design` etabliert (`docs/design-system.md`, `apps/web/app/globals.css`); `/amtliches` als Master-Template (ADR 0003, 0006)
+6. `/web-design-guidelines` + `/impeccable` über das Ergebnis gelaufen
+7. **Monorepo-Migration:** ein pnpm-Workspace (`apps/web`, `packages/db`), `@regi/db` als geteiltes Schema. Löst ADR 0001 ab (ADR 0007, 0008)
 
-> Schritt 4/5: `/frontend-design` wurde bewusst hinter die Pipeline-Validierung verschoben – das Design-System arbeitet mit echtem Inhalt statt mit Vermutungen (ADR 0003).
+### Nächste Schritte
+8. `apps/ingest` anlegen: Cloudflare Workers + Wrangler + Hono + Drizzle (`@regi/db` als `workspace:*`)
+9. Erste Source `epublikation.ts`: Fetch + Zod + Upsert + Revalidate-POST an `/api/revalidate`
+10. Wenn echte Daten in der DB landen und auf der Seite erscheinen: zweite Quelle. Erst dann weiter polieren.
+
+> `/frontend-design` wurde bewusst hinter die Pipeline-Validierung verschoben — das Design-System arbeitet mit echtem Inhalt statt mit Vermutungen (ADR 0003).
 
 **Reihenfolge ist nicht verhandelbar.** Erst Pipeline, dann Inhalt, dann Politur. Nicht umgekehrt.
