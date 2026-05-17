@@ -452,6 +452,71 @@ h2 {
   }
 }
 
+/* --- Event row -------------------------------------------------------------
+   An instance of the .notice gazette row (reused unchanged: grid, gutter,
+   title, foot, reveal). Only the event-specific meta + series lines are new.
+   Tokens only — see docs/design-system.md §10. ----------------------------- */
+
+/* time · place · organizer — quiet, subordinate to the title */
+.event__meta {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-meta);
+}
+
+/* the start time speaks in the system's mono data voice */
+.event__time {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.event__where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.event__sep {
+  color: var(--rule-strong);
+}
+
+/* staffelung sub-line: «N weitere Termine bis TT.MM.» — mono so the figures
+   align, muted so it never competes with the title */
+.event__series {
+  margin-top: var(--space-2);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--ink-meta);
+}
+
+/* page-level attribution footer (same shape as the /wetter colophon; kept
+   namespaced per the per-feature precedent — a shared `.colophon` is a
+   documented future generalisation, not an en-passant refactor) */
+.event__colophon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+}
+
+/* Mobile: the .notice grid already collapses the date into a meta line; here
+   we additionally drop the secondary place/organizer, keeping title + next
+   date + time + series (mirrors the weather strip hiding its params). */
+@media (max-width: 39.99rem) {
+  .event__where {
+    display: none;
+  }
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one

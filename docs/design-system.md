@@ -278,3 +278,41 @@ mono/sans voices — and reuses `.tag` / `.ext` / `.empty` unchanged.
 
 The strip is the template for any future *state* widget (ÖV live board, air
 quality): a bounded block, mono figures, sans labels, accent links-only.
+
+---
+
+## 10. Event row — `.event…` (added with the Eventfrog source)
+
+`/veranstaltungen` is a dated list, so it is **not** a new layout: each event
+*series* is an instance of the `.notice` row, reused unchanged (grid, mono
+date gutter, `.notice__title`, `.notice__foot`, the `regi-rise` reveal). Only
+two event-specific lines are new, plus a page colophon.
+
+- **Gutter** = the *next* occurrence's date in the existing `.notice__date`
+  mono `--ink-meta` voice (TT.MM.JJJJ). The date gutter is **never** accent —
+  accent stays links-only (a request to make it «Wappenrot» was resolved
+  against the system: §2/§6 keep the gutter muted, exactly like `/amtliches`).
+  The start *time* is not in the gutter (same rule as `/amtliches`); it sits
+  in the meta line.
+- **`.event__meta`** — a quiet `--ink-meta` line under the title: the start
+  time in the mono data voice (`.event__time`, `tabular-nums`) then, on
+  desktop, place and organizer in sans, `·`-separated (`.event__sep`,
+  `--rule-strong`, the `.notice__sep` look). `.event__where` (place +
+  organizer) is **hidden < 39.99rem** — mobile keeps title + next date + time
+  + series, mirroring how the weather strip drops `.weather__params`.
+- **`.event__series`** — the staffelung sub-line, mono `tabular-nums`
+  `--ink-meta`, subordinate to the title. Rendered only when a series has
+  occurrences beyond the next one; phrasing scales with how a reader thinks
+  about cadence, not raw counts: 1 → «1 weiterer Termin am TT.MM.»; 2–10 →
+  «N weitere Termine bis TT.MM.»; >10 → «Wiederkehrend bis TT.MM.» (never
+  «Tagesserie» — the cadence is not known, so the word must not over-claim).
+- **`.event__colophon`** — the rule-topped page attribution footer (`.tag`
+  «Quelle: Eventfrog» · `.ext`), identical in shape to `.weather__colophon`.
+  Two namespaced colophons now exist; a shared `.colophon` primitive is the
+  obvious next generalisation but is deliberately **not** an en-passant
+  refactor (CLAUDE.md §9) — recorded here as a known, intentional duplication.
+
+One source-native id (`events.group_id`, ADR 0012 amendment) drives the
+one-card-per-series collapse: ~150 raw occurrences render as ~10 rows. The
+ungrouped (`group_id` NULL) events appear individually. This is the template
+for any future *grouped* list (e.g. a recurring-meeting agenda).
