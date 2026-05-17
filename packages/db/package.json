@@ -1,0 +1,26 @@
+{
+  "name": "@regi/db",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "seed": "node --env-file=../../.env.local scripts/seed-mock.mts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "1.1.0",
+    "drizzle-orm": "0.45.2",
+    "ulid": "3.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "drizzle-kit": "0.31.10",
+    "typescript": "^5"
+  }
+}
