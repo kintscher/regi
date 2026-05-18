@@ -1,4 +1,13 @@
-import { index, integer, pgTable, real, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  date,
+  index,
+  integer,
+  pgTable,
+  real,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { ulid } from "ulid";
 
 /**
@@ -158,5 +167,63 @@ export const events = pgTable(
     // /veranstaltungen groups by series; index the grouping key up front
     // rather than as a later perf fix.
     index("events_source_group_idx").on(t.sourceId, t.groupId),
+  ],
+);
+
+/**
+ * Special waste-collection dates (regensdorf-waste, ADR 0013 — the
+ * /abfalldaten `#icmsTable-abfallsammlung` island). A *new* table, not a
+ * `publications` reuse: this is a different data model (a dated collection
+ * event with a type + route, no title/body/notice shape), so ADR 0013's
+ * schema-reuse rule explicitly carves it out as the legitimate divergence
+ * case ("different data model → new table"; provenance alone never justifies
+ * one — the shape does).
+ *
+ * Scope is the *special* collections only (Karton/Papier/Häcksel/Sonderab-
+ * fall). The *regular* weekly Kehricht/Grüngut pickups are NOT rows here:
+ * the source models them as free-text recurrence rules, so they live as
+ * static frontend constants and are computed deterministically (Fork 5;
+ * apps/web/lib/sources/regensdorf-waste/). No empty/synthetic rows for a
+ * recurrence the source never enumerates (CLAUDE.md §10).
+ *
+ * `collection_date` is a calendar `date` (no time/zone): a collection
+ * happens on a day, and a timestamptz would invite TZ-shift bugs.
+ * (source_id, external_id) is unique so ingestion can upsert idempotently.
+ */
+export const wasteCollections = pgTable(
+  "waste_collections",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => ulid()),
+    sourceId: text("source_id")
+      .notNull()
+      .references(() => sources.id, { onDelete: "restrict" }),
+    externalId: text("external_id").notNull(),
+    // Collection type as published (e.g. "Kartonsammlung", "Papiersammlung",
+    // "Häckselgutsammlung", "Sonderabfallsammlung"). Source-faithful free
+    // text, not an enum (CLAUDE.md: union strings, no enums) — a new type
+    // must not break ingestion.
+    wasteType: text("waste_type").notNull(),
+    collectionDate: date("collection_date").notNull(),
+    // Abfuhrkreis ids exactly as the source array (e.g. ["435","436"] =
+    // Tour Nord/Süd, or a Werkhof id). Kept as text[] so the frontend can
+    // filter by tour without parsing a joined string.
+    routeIds: text("route_ids").array().notNull(),
+    // Human-readable route list as published ("Tour Nord, Tour Süd" /
+    // "Werkhof Regensdorf") — display voice, paired with routeIds.
+    routeNames: text("route_names").notNull(),
+    rawHash: text("raw_hash").notNull(),
+    ingestedAt: timestamp("ingested_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex("waste_collections_source_external_uniq").on(t.sourceId, t.externalId),
+    // /abfall queries "upcoming" by date; index it up front, not as a later
+    // perf fix (mirrors the events_source_group_idx rationale).
+    index("waste_collections_date_idx").on(t.collectionDate),
   ],
 );
