@@ -768,6 +768,78 @@ h2 {
   border-top: 1px solid var(--rule);
 }
 
+/* --- Section header & multi-section page (/abfall) -------------------------
+   /abfall is the first page with several sections in one column. Solved as a
+   gazette RUBRIC BREAK, not cards (§1): the section head mirrors the
+   .page__head masthead structure (text + bottom rule + margin) but lighter —
+   the --rule hairline (not --rule-strong) and --text-lg (not --text-xl) — so
+   the hierarchy reads masthead > rubric > rows via weight + rule,
+   Müller-Brockmann style. Sections are one continuous column separated only
+   by vertical space; no panel, border or background. The .weather__loghead
+   (--text-lg sub-head) is the precedent. Tokens only. See design-system §13.
+   ------------------------------------------------------------------------- */
+.abfall__section + .abfall__section {
+  margin-top: var(--space-7);
+}
+
+.abfall__sectionhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule);
+  /* the h2 carries an id (aria-labelledby / hash target): keep it off the
+     viewport edge if ever deep-linked (WIG heading-anchor rule) */
+  scroll-margin-top: var(--space-4);
+}
+
+/* a quiet qualifier on the rubric (not a heading) — the .tag register */
+.abfall__sectionnote {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-meta);
+}
+
+/* quiet sub-line under a .notice__title — the .event__meta grammar */
+.abfall__meta {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-meta);
+}
+
+/* the weekday is the human scan-target paired with the mono gutter date —
+   one notch up from the meta voice, still quiet (not accent, not heavy) */
+.abfall__weekday {
+  color: var(--ink-muted);
+}
+
+/* holiday move: signalled by INK WEIGHT, never colour (§11 .ov__delay--late
+   precedent — accent stays links/selection only) */
+.abfall__shift {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.abfall__colophon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one

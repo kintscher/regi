@@ -421,3 +421,55 @@ documented, deliberate not-en-passant refactor (CLAUDE.md §9).
 This is the template for any future *facetted single-source list* (e.g. a
 press-category or rubric filter): the `.tag`-voice index rail, selection as
 the sanctioned accent role triple-encoded, hairline-bounded, never a pill.
+
+---
+
+## 13. Section header & multi-section page — `.abfall…` (added with the regensdorf-waste source)
+
+`/abfall` is the first page that is **not** a single list: it stacks two
+sections — «Nächste Abfuhren» (the computed weekly rules, Fork 5) and
+«Kommende Spezialtermine» (the ingested dated collections) — plus the §12
+`.catfilter` rail reused unchanged for the Tour facette. Multiple sections
+risk becoming cards/panels; §1 forbids that. Solved as a printed-Amtsblatt
+**rubric break**, not a panel.
+
+- **Section head = a lighter masthead.** `.abfall__sectionhead` mirrors the
+  `.page__head` structure exactly — text, a bottom rule, a bottom margin —
+  but every weight is stepped down: the light `--rule` hairline (not
+  `--rule-strong`), `--text-lg` (not the masthead `--text-xl`), no extra
+  weight token (the global `h1,h2` 600 carries it). The reader gets an
+  unambiguous three-level hierarchy — masthead `>` rubric `>` row — built
+  from rule strength + size, Müller-Brockmann style, with **zero** box,
+  border, background or shadow. The `.weather__loghead` `--text-lg` sub-head
+  (§9) is the precedent this generalises.
+- **One continuous column.** Sections are separated only by vertical space
+  (`.abfall__section + .abfall__section` → `--space-7`); the first sits
+  naturally below the `.catfilter` rule. Nothing encloses a section, so two
+  stacked sections still read as one calm gazette page scrolling down, not as
+  two tiles. Rows inside are the `.notice` primitive reused unchanged (mono
+  date gutter, `h3` `.notice__title` under the section's `h2` — correct
+  heading order), so a section is just a titled stretch of the same ruled
+  list.
+- **`.abfall__sectionnote`** («nächste 30 Tage») is a qualifier, not a
+  heading: the quiet uppercase-tracked `.tag` register, baseline-aligned
+  beside the rubric title — a dateline on the rubric, never competing with
+  it.
+- **`.abfall__meta`** is the quiet sub-line under a `.notice__title`,
+  reusing the `.event__meta` grammar verbatim (`--ink-meta`, `--text-sm`,
+  baseline flex, `·`-separated). `.abfall__weekday` is one notch up
+  (`--ink-muted`): the human scan-target — «Freitag» — paired with the
+  machine-precise mono date in the gutter; still quiet, never accent.
+- **Holiday move = ink weight, not hue.** When the Grüngut-Tour-Süd
+  Montag→Mittwoch exception fires, the row carries `.abfall__shift`
+  («verschoben (Feiertag)») in weight 600 full `--ink` — the single heavier
+  element on an otherwise `--ink-meta` line. This is the §11 `.ov__delay--late`
+  precedent applied unchanged: an exception is signalled by heavier ink, never
+  by colour; `--accent` stays links/selection only.
+- **`.abfall__colophon`** is the page attribution footer, identical in shape
+  to `.weather__/.event__/.ov__/.gemeinde__colophon` — a fifth namespaced
+  instance; the shared `.colophon` generalisation remains the documented,
+  deliberate not-en-passant refactor (CLAUDE.md §9).
+
+This is the template for any future *multi-section* page (a future
+dashboard-style overview, a combined service page): rubric breaks not cards,
+`.notice` lists reused under stepped-down heads, exceptions by weight.
