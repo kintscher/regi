@@ -11,6 +11,11 @@ import {
   REVALIDATE_TAG as REGENSDORF_NEWS_TAG,
   runRegensdorfNews,
 } from "./regensdorf-news";
+import {
+  SLUG as REGENSDORF_WASTE_SLUG,
+  REVALIDATE_TAG as REGENSDORF_WASTE_TAG,
+  runRegensdorfWaste,
+} from "./regensdorf-waste";
 import type { SourceRunResult } from "./types";
 
 export interface IngestSource {
@@ -30,5 +35,10 @@ export const sources: IngestSource[] = [
     slug: REGENSDORF_NEWS_SLUG,
     revalidateTag: REGENSDORF_NEWS_TAG,
     run: runRegensdorfNews,
+  },
+  {
+    slug: REGENSDORF_WASTE_SLUG,
+    revalidateTag: REGENSDORF_WASTE_TAG,
+    run: runRegensdorfWaste,
   },
 ];
