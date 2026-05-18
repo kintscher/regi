@@ -120,18 +120,40 @@ source is either deferred or pursued via a different documented mechanism, with
 its own ADR. This bound keeps "scraping" in regi narrow and contract-based, not
 open-ended DOM mining.
 
-**Schema reuse (positive precedent, Fork 2).** Source 5 reuses the existing
-`publications` table rather than adding a parallel one: its shape (title +
-body + publishedAt + url, idempotent on `(source_id, external_id)`,
-`source_id` discriminator) is exactly the official/authority-notice shape, and
-`CLAUDE.md` §10 forbids schema-by-source proliferation without need. The
-`publications` doc-comment is widened in the same change-set to state it now
-spans multiple authority sources (ePublikation + regensdorf-news, further
-sources expected; separation via `source_id`). This is the recommended default
-for any future embedded-JSON authority-notice source: **one table, many
-sources, source-faithful rows** — schema divergence (e.g. Source 6's
-`waste_collections`) is reserved for genuinely different data (dated
-collection events, no `body`), not different provenance of the same shape.
+**Schema reuse (Fork 2).** Source 5 reuses the existing `publications` table
+rather than adding a parallel one — the governing rule is the dedicated
+*Schema reuse over table inflation* section below.
+
+## Schema reuse over table inflation (pattern obligation)
+
+This is a binding pattern, not a one-off Fork-2 note: it governs every future
+source, embedded-JSON or API.
+
+Schema reuse over table inflation is the default pattern whenever the data
+shape is identical or near-identical. Sources are kept apart by `source_id`.
+When a new source introduces an additional field (e.g. `category` for
+source-specific classification), that field is added **additively** to the
+existing table, **nullable**. Existing sources do not populate it (NULL) and
+stay unchanged. That is the right granularity: no n:m tables for rarely-used
+fields, no table duplication for congruent shapes.
+
+Concrete instance: regensdorf-news extends `publications` with `category` +
+`url` (migration `0005`, additive `ADD COLUMN`, both nullable, with SQL
+`COMMENT ON COLUMN` + parallel Drizzle doc-comments). ePublikation rows remain
+with `category = NULL` and `url = NULL`, entirely unchanged; the
+`publications` doc-comment is widened to state the table now spans multiple
+authority sources (ePublikation + regensdorf-news, further sources expected;
+separation via `source_id`; source-specific fields additive and nullable).
+`CLAUDE.md` §10 (no schema-by-source proliferation without need) is the
+constitutional anchor for this.
+
+The boundary: schema divergence into a **new** table is reserved for
+genuinely different data, not different provenance of the same shape.
+Source 6's `waste_collections` (dated collection events, no `body`,
+route/Abfuhrkreis structure) is the legitimate divergence case — its shape is
+not near-congruent with `publications`, so reuse would be the wrong call
+there. "Near-identical shape → reuse + nullable column"; "different data
+model → new table". Provenance alone never justifies a new table.
 
 ## Consequences
 
