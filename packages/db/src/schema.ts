@@ -27,9 +27,11 @@ export const sources = pgTable("sources", {
  * /aktuellesinformationen, ADR 0013). Adding further authority sources of the
  * same shape is explicitly expected; rows stay source-faithful and sources are
  * kept apart via `source_id` (no cross-source dedup at ingest — see the
- * deferred dedup-evaluation issue). `body` is kept on purpose: official content
- * is free to reproduce under URG Art. 5 (v1 leaves it NULL for both sources;
- * full body is a follow-up).
+ * deferred dedup-evaluation issue). Source-specific fields are added
+ * additively and nullable (ADR 0013 schema-reuse rule): a source that needs a
+ * field adds it; existing sources leave it NULL and stay unchanged. `body` is
+ * kept on purpose: official content is free to reproduce under URG Art. 5
+ * (v1 leaves it NULL for both sources; full body is a follow-up).
  *
  * Press articles are deliberately NOT modelled here. They will get a separate
  * table with no `body` column (title + snippet + link + date only) — a
@@ -51,6 +53,13 @@ export const publications = pgTable(
     externalId: text("external_id").notNull(),
     title: text("title").notNull(),
     body: text("body"),
+    // Source-specific categorization (e.g. regensdorf-news: news vs
+    // pressemitteilungen). NULL for sources without categorization
+    // (ePublikation rows stay NULL). ADR 0013 schema-reuse rule.
+    category: text("category"),
+    // Per-item detail URL. NULL means fallback to source.url (homepage) for
+    // display (ePublikation rows stay NULL; see /amtliches link fallback).
+    url: text("url"),
     publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
     ingestedAt: timestamp("ingested_at", { withTimezone: true }).notNull().defaultNow(),
     rawHash: text("raw_hash").notNull(),
