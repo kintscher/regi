@@ -22,13 +22,20 @@ export const sources = pgTable("sources", {
 });
 
 /**
- * Official notices (ePublikation / Amtsblatt). `body` is kept on purpose:
- * official content is free to reproduce under URG Art. 5.
+ * Official and authority notices from multiple sources — currently
+ * ePublikation (shab.ch / SECO API) and regensdorf-news (regensdorf.ch
+ * /aktuellesinformationen, ADR 0013). Adding further authority sources of the
+ * same shape is explicitly expected; rows stay source-faithful and sources are
+ * kept apart via `source_id` (no cross-source dedup at ingest — see the
+ * deferred dedup-evaluation issue). `body` is kept on purpose: official content
+ * is free to reproduce under URG Art. 5 (v1 leaves it NULL for both sources;
+ * full body is a follow-up).
  *
  * Press articles are deliberately NOT modelled here. They will get a separate
  * table with no `body` column (title + snippet + link + date only) — a
  * structural guarantee that press full text is never cached (CLAUDE.md §7).
- * See ADR 0004.
+ * See ADR 0004. (regensdorf-news `pressemitteilungen` is a *source category*
+ * of municipal communications, not press-industry articles — it belongs here.)
  *
  * (source_id, external_id) is unique so ingestion can upsert idempotently.
  */
