@@ -360,3 +360,64 @@ cell borders), mono figures, sans prose, accent links-only.
 This is the template for any future *real-time tabular* source (traffic, air
 quality grids): a semantic table, mono columns, state by weight not hue,
 on-demand (ADR 0011) with a `.sr-only` caption and an `aria-live` freshness.
+
+---
+
+## 12. Category filter — `.catfilter…` (added with the regensdorf-news source)
+
+`/gemeinde` is one source (`regensdorf-news`, ADR 0013) carrying two source
+categories (`pressemitteilungen`, `news`). It needs a facette — and the brief
+called it a «Pill-Filter». A literal pill (chip, fill, radius) is forbidden
+by §1 (no cards) and §6 («pills read as SaaS»). The control is therefore
+**not** a pill: it is a **gazette index rail**, the same move §9–§11 make —
+take the new requirement and re-set it in the existing grammar instead of
+importing a product-UI component.
+
+- **Voice.** Each option is the quiet uppercase tracked `.tag` voice
+  (`--text-xs`, weight 500, `0.06em`, `--ink-meta`) — the page's existing
+  meta register (source tags, `<th>` headers). The filter therefore reads as
+  a *section index*, like the rubric labels atop a printed Amtsblatt, not as
+  buttons. The count rides in the **mono `tabular-nums` data voice**
+  (`--ink-meta`) — the same mono/sans pairing as date-gutter vs title, figure
+  vs unit. A figure is never set in `--accent` (the §9 rule): the count stays
+  `--ink-meta` even inside the accent-coloured active option.
+- **Selection is the sanctioned accent role.** §2's token table lists
+  `--accent` as «Links, external affordance, **selection**». A chosen facette
+  *is* selection — categorically different from `/ov`'s delay, which is data
+  *state* and is therefore weight-not-hue (§11). So accent here is on-system,
+  not a §11 violation: a selected facette behaves like a selected link, not
+  like a coloured status. To stay robust without relying on hue alone,
+  selection is **triple-encoded**: `--accent` colour **+** weight 600 (the
+  §11 emphasis device) **+** a 2px `--accent` bottom rule. The underline is a
+  *horizontal* hairline — the only rule grammar the system allows (§11: no
+  vertical rules, no boxes). The 2px border is reserved transparent on every
+  state so activating a facette never shifts the row.
+- **Affordance split.** Inactive hover darkens toward full `--ink` (signals
+  «interactive») — deliberately *not* accent, because accent is reserved for
+  the selected facette and for links. Focus reuses the global 2px accent
+  `:focus-visible` ring unchanged. The options are real `<Link>`s, not client
+  buttons: the facette is pure URL state (CLAUDE.md §4), so Cmd/middle-click,
+  prefetch, keyboard and shareability come for free and `/gemeinde` ships
+  **zero client JS** (the list is a pure RSC that re-renders server-side on
+  navigation; the active value is parsed by the nuqs server loader). Selection
+  is also exposed as `aria-current="page"` (a third, non-visual encoding).
+- **Frame & rhythm.** The block is hairline-bounded exactly like `.weather`
+  (`--rule` bottom, `--space-4` pad, `--space-5` margin), sitting between the
+  `.page__head` (`--rule-strong`) and the `.notices` list — the same
+  masthead → ruled control → list cadence the weather strip established.
+- **Mobile.** The rail scrolls horizontally (no wrap, hidden scrollbar)
+  rather than stacking — mirroring how `.weather__params` / `.event__where`
+  / `.ov__c-plat` shed/relayout secondary chrome at the same `39.99rem`
+  breakpoint. The reserved transparent underline keeps it shift-free.
+- **Motion.** Only a `color 0.15s` transition, unguarded — identical to
+  `.ext`. The rail does **not** take the `regi-rise` reveal: a filter must be
+  usable the instant the page paints, not animate in.
+
+`.gemeinde__colophon` is the page attribution footer, the same shape as
+`.weather__colophon` / `.event__colophon` / `.ov__colophon`. A fourth
+namespaced instance — the shared `.colophon` generalisation remains the
+documented, deliberate not-en-passant refactor (CLAUDE.md §9).
+
+This is the template for any future *facetted single-source list* (e.g. a
+press-category or rubric filter): the `.tag`-voice index rail, selection as
+the sanctioned accent role triple-encoded, hairline-bounded, never a pill.
