@@ -6,6 +6,11 @@ import {
   SLUG as WEATHER_SLUG,
   REVALIDATE_TAG as WEATHER_TAG,
 } from "./existenz-weather";
+import {
+  SLUG as REGENSDORF_NEWS_SLUG,
+  REVALIDATE_TAG as REGENSDORF_NEWS_TAG,
+  runRegensdorfNews,
+} from "./regensdorf-news";
 import type { SourceRunResult } from "./types";
 
 export interface IngestSource {
@@ -21,4 +26,9 @@ export const sources: IngestSource[] = [
   { slug: SLUG, revalidateTag: REVALIDATE_TAG, run: runEpublikation },
   { slug: WEATHER_SLUG, revalidateTag: WEATHER_TAG, run: runExistenzWeather },
   { slug: EVENTFROG_SLUG, revalidateTag: EVENTFROG_TAG, run: runEventfrog },
+  {
+    slug: REGENSDORF_NEWS_SLUG,
+    revalidateTag: REGENSDORF_NEWS_TAG,
+    run: runRegensdorfNews,
+  },
 ];
