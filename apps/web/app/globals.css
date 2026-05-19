@@ -1157,6 +1157,79 @@ h2 {
   margin-bottom: 0;
 }
 
+/* --- Page prose (§16) — typography for the mandatory info/legal pages
+   (/quellen, /impressum, /datenschutz, /kolophon). These are flowing text
+   with sub-heads and labelled fields, NOT dated lists; the .notice grammar
+   doesn't fit. .page__prose composes WITH .page (shell + padding) and styles
+   its direct content (h2 sub-heads, paragraphs, definition lists) using
+   existing tokens — no new colour/type/spacing step (§14 discipline). Body
+   measure capped at 62ch (the §3 editorial limit reused). --------------- */
+.page__prose > * + * {
+  margin-top: var(--space-4);
+}
+
+.page__prose h2 {
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  margin-top: var(--space-6);
+  /* deep-linkable sub-head kept off the viewport edge (§13 / WIG) */
+  scroll-margin-top: var(--space-4);
+}
+
+.page__prose p {
+  max-width: 62ch;
+  color: var(--ink-muted);
+}
+
+.page__prose a {
+  /* prose links inherit the .ext accent grammar (the system's link voice) —
+     legal/colophon pages link to external destinations (mailto:, github,
+     license texts), which is exactly the .ext role. No underline at rest;
+     hover underlines. */
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.page__prose a:hover,
+.page__prose a:focus-visible {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.page__prose dl {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  column-gap: var(--space-5);
+  row-gap: var(--space-3);
+  max-width: 62ch;
+}
+
+.page__prose dt {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-meta);
+}
+
+.page__prose dd {
+  color: var(--ink-muted);
+}
+
+/* Mobile: definition list collapses to single column with label-then-value
+   stack (mirrors the .notice gutter collapse at the same breakpoint). */
+@media (max-width: 39.99rem) {
+  .page__prose dl {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-1);
+  }
+  .page__prose dt {
+    padding-top: var(--space-2);
+  }
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one

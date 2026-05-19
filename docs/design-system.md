@@ -763,6 +763,91 @@ in §10's `.colophon`-style deferral). Generalisation to a shared
 `.row__meta` primitive is the correct path but is **deliberately
 deferred** — not en passant in this PR (CLAUDE.md §9). The hidden
 coupling (a future waste-only tweak to `.abfall__meta` would silently
-change editorial rows on the dashboard) is acknowledged. Refactor when
-the fourth instance arrives or when one source needs its meta-row to
-diverge.
+change editorial rows) is acknowledged. Refactor when the fourth
+instance arrives or when one source needs its meta-row to diverge.
+
+---
+
+## 16. Page prose — `.page__prose` (mandatory info / legal pages)
+
+The mandatory Phase-4 pages — `/quellen`, `/impressum`, `/datenschutz`,
+`/kolophon` — are flowing prose with sub-heads and labelled fields,
+not dated lists. The `.notice` grammar built for the data feeds doesn't
+fit: there is no date axis to put in the gutter and the content type is
+free text, not a record. §16 introduces the smallest possible **prose
+primitive** that lets these pages render at gazette quality while
+introducing **zero new tokens**.
+
+### Why a new primitive (vs. raw semantic HTML)
+
+The system's global `body { font-size: 1rem; line-height: 1.6 }` styles
+paragraphs correctly out of the box, but it does **not** size `<h2>`
+sub-heads (the global `h1, h2 { font-weight: 600; line-height: 1.2 }`
+rule omits size). A raw `<h2>` would inherit browser-default (~1.5em),
+which lands almost exactly on `.page__title` — wrong hierarchy on a
+page where the H1 must dominate. `.page__prose` provides the stepped-
+down sub-head voice (`--text-lg`, the same step §13's
+`.abfall__sectionhead` uses) without re-styling every page.
+
+### What `.page__prose` does
+
+It composes **with** `.page` (which provides the 48 rem shell and
+padding) and styles its **direct content**:
+
+- **Stack rhythm** — `> * + *` gets `margin-top: --space-4`, so
+  paragraphs, lists, definition lists and sub-heads all step down
+  rhythmically without per-element margin tuning.
+- **`h2` sub-head** — `--text-lg`, `letter-spacing: -0.01em`, the
+  stepped-down rubric voice. No bottom rule (these are flowing prose
+  pages, not multi-section gazette pages — no rubric break is needed).
+  `scroll-margin-top` so a deep-linked sub-head stays off the viewport
+  edge (§13 / WIG precedent).
+- **`p`** — `--ink-muted` body colour, `max-width: 62ch` (the §3
+  editorial measure cap reused, so legal paragraphs don't drift
+  uncomfortably wide on desktop).
+- **`a`** — accent link in the `.ext`-grammar: rest accent, no
+  underline; hover/focus accent-hover + underline at 2 px offset.
+  Mandatory pages legitimately link to external destinations
+  (mailto:, github, license URLs), which is exactly the `.ext` role.
+  No `↗` glyph here — these are prose links inside a sentence, not the
+  standalone external affordance per row that `.ext` is built for; the
+  underline-on-hover carries enough wayfinding. Accent is therefore
+  used on these pages, on purpose (vs. its absence on the dashboard) —
+  links are precisely §2's primary sanctioned accent role.
+- **`dl`** — a two-column grid (`9rem 1fr`, `--space-5` column-gap,
+  `--space-3` row-gap, `max-width: 62ch`) for labelled fields like
+  `Verantwortlich` / `Kontakt` / `Rechtsform`. `dt` speaks in the
+  `.tag` register (uppercase, tracked, `--ink-meta`); `dd` is body in
+  `--ink-muted`. The `dl` collapses to a single-column label-stack at
+  `39.99rem` — same breakpoint as every other gutter-collapse in the
+  system.
+
+### What `.page__prose` doesn't do
+
+- No new colour, type-size, weight, or spacing token.
+- No rubric-break sections (`.dash-section`'s job).
+- No `.notice` row chrome (gutter, hairlines between items).
+- No "Stand: …" stamp class — the existing `.page__meta` voice (mono,
+  `--text-sm`, `--ink-meta`) is reused inline for legal-text revision
+  dates, the same way `/abfall` uses it for "Stand: TT.MM.JJJJ".
+
+### Per-page composition
+
+- **`/quellen`** — `.page__prose` wraps only the intro paragraph; the
+  source list itself is the existing `.notices` / `.notice` primitive
+  (sources are a *list*, not prose). One `.page__meta` "Stand: …"
+  stamp at the foot if needed; the per-row `last_synced_at` covers
+  most of it.
+- **`/impressum`** — `.page__prose` with one paragraph and one `<dl>`
+  (Verantwortlich, Kontakt, Rechtsform); a `.page__meta` "Stand: …"
+  stamp at the bottom.
+- **`/datenschutz`** — `.page__prose` with two or three `<h2>`
+  sub-heads, paragraphs, one or two prose-`<a>` links. `.page__meta`
+  "Stand: …" stamp.
+- **`/kolophon`** — `.page__prose` with sub-heads, paragraphs and a
+  `<dl>` (Tech, Code, Design, Lizenzen). `.page__meta` "Stand: …"
+  stamp.
+
+This is the template for any future *long-form text* page (an article,
+a release note, a static FAQ): wrap content in `.page__prose`, use
+semantic HTML, reuse tokens, **no new step**.
