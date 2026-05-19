@@ -1145,6 +1145,18 @@ h2 {
   color: var(--ink-meta);
 }
 
+/* Composition override (§15, ADR 0014): the .dash-section provides its own
+   bottom-of-content separator via the next rubric's hairline + the --space-7
+   gap. Inside a section, the standalone .weather closure (own padding-bottom +
+   --rule + --space-6 margin) becomes redundant and reads as a card-like frame
+   (§1 violation pressure). Reset the closure here; the standalone primitive
+   on /amtliches and /wetter is untouched. */
+.dash-section .weather {
+  padding-bottom: 0;
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one

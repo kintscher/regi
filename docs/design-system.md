@@ -741,3 +741,28 @@ This is the template for any future *front-page index* (a combined
 homepage with more sources, a press archive overview, a service hub):
 the §13 rubric-break grammar generalised, primitives reused
 unchanged, accent absent, single column, **no new token**.
+
+### Composition overrides
+
+Standalone primitives may carry their own closure chrome (e.g.
+`.weather`'s `padding-bottom` + `border-bottom` + `margin-bottom`) that
+becomes redundant inside a composition like `.dash-section` — the
+section's next-rubric hairline + the `--space-7` gap already provide
+the separator, and the doubled rule reads as the §1-forbidden
+card-frame. Such redundancies are reset **at the composition level**,
+not mutated in the primitive. The standalone primitive must remain
+portable to other contexts (`/amtliches`, `/wetter`). See the
+`.dash-section .weather` reset in `app/globals.css` §15.
+
+### Deferred refactor — the `.row__meta` grammar
+
+The `.abfall__meta` rule (§13) is now reused on Amtliches and Gemeinde
+editorial rows within the dashboard, making the dashboard the **third
+instance** of the same byte-identical grammar (alongside `.event__meta`
+in §10's `.colophon`-style deferral). Generalisation to a shared
+`.row__meta` primitive is the correct path but is **deliberately
+deferred** — not en passant in this PR (CLAUDE.md §9). The hidden
+coupling (a future waste-only tweak to `.abfall__meta` would silently
+change editorial rows on the dashboard) is acknowledged. Refactor when
+the fourth instance arrives or when one source needs its meta-row to
+diverge.
