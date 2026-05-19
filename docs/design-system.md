@@ -570,11 +570,62 @@ links/external/in-page-selection-only across the entire surface.
   ring around the entire content region would be worse UX. Documented here
   so it is not mis-read as the `outline-none`-without-replacement
   anti-pattern.
-- **Mobile (< 39.99rem):** wordmark only — the nav is hidden and **no
-  burger this phase**; a placeholder that does nothing is a broken
-  affordance, against the system's honesty principle. The working burger +
-  off-canvas drawer ship together in Phase 5; routes stay reachable by URL
-  meanwhile (no regression — that was already the only way).
+- **Mobile (< 39.99rem):** wordmark + burger. The §14 «no burger this
+  phase» placeholder is **resolved in Phase 5** by the atomic burger +
+  off-canvas drawer (see «Mobile drawer» below). Both render from the same
+  `NAV_ITEMS` constant — the desktop nav and the mobile drawer cannot
+  drift, by construction.
+
+### Mobile drawer — `.site-burger…` / `.site-drawer…` (Phase 5 atomic ship)
+
+The burger trigger sits inline-right of the wordmark below 39.99 rem and
+opens an off-canvas drawer that slides in from the right, capped at
+`min(22rem, 80vw)` so it never feels stretched on tablets. The same
+NAV_ITEMS render in the drawer with the same active-rubric grammar — ink
+weight + `--ink` + `aria-current="page"`, **never accent** (§14 carries
+to the drawer verbatim).
+
+- **Burger visual** — a three-bar ≡, animating to an X-cross when open
+  (outer bars rotate 45°, middle fades). `currentColor` lets the bars
+  inherit `--ink`. Reduced-motion drops the spin.
+- **Backdrop tint** — the only place the system tints `--ink` with
+  opacity, via `color-mix(in srgb, var(--ink) 38%, transparent)`. **Not
+  a new token** — a compositional derivation of the existing `--ink`.
+  Modal-dialog convention; `aria-hidden` so SRs never read it. The
+  backdrop is the click-outside-to-close target.
+- **Drawer chrome** — `--paper` background; **no border or shadow** —
+  the dimmed backdrop is the visual separator (the system has no
+  vertical rules, §11; a dropshadow would be SaaS-elevation, §1
+  pressure). `100dvh` height so the browser chrome doesn't clip, and
+  safe-area padding so notches are honoured.
+- **Drawer links** — the §14 nav `.tag` voice (`--text-xs`, 500,
+  uppercase, `0.06em`, `--ink-meta`), with `padding-block: --space-3`
+  so each tap target is well above the WCAG 2.5.8 24 px floor (≥44 px
+  on phone, iOS standard). Active rubric is ink-weight, never accent.
+- **Mandatory legal links** sit at the bottom of the drawer in their
+  own footer block, hairline-separated by a horizontal `--rule` (a
+  conventional rubric break, *not* a vertical column rule).
+- **A11y discipline (mandatory):**
+  - `role="dialog"` + `aria-modal="true"` + `aria-label="Hauptnavigation"`
+    on the drawer
+  - `aria-expanded` + `aria-controls` on the burger, label flips
+    «Navigation öffnen» / «Navigation schliessen»
+  - DIY focus-trap with `useEffect` — Tab/Shift+Tab wraps inside the
+    drawer. No npm focus-trap library: the orchestrator pre-decision
+    explicitly rejected one as over-engineering for a single component.
+  - Escape closes; outside-click on the backdrop closes; route change
+    (`pathname`) closes; close returns focus to the burger.
+  - First drawer link focused on open (`requestAnimationFrame` deferral
+    so the visibility transition has applied).
+  - Body scroll-lock while open (`overflow: hidden` on `document.body`,
+    restored on close).
+  - `aria-hidden` on the drawer when closed and `tabIndex=-1` on its
+    links — belt-and-suspenders with the CSS `visibility: hidden`
+    transition.
+- **z-index** — drawer 60, backdrop 50, header 10, skip-link 20.
+  Adding two literals (50, 60) to the existing `10` / `20` is on the
+  §14 "single z-index sticky layer" discipline — concrete values, no
+  z-scale token system invented for one modal layer.
 
 ### Footer: a gazette imprint, not a megafooter
 

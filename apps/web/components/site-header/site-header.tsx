@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MobileNav } from "./mobile-nav";
 import { SiteNav } from "./site-nav";
 
 /**
@@ -10,13 +11,12 @@ import { SiteNav } from "./site-nav";
  *
  * Sticky with no scroll listener and no shadow: the opaque --paper background
  * plus the permanent --rule-strong masthead rule already separate it from
- * content scrolling beneath — the gazette grammar's own device, zero JS,
- * keeping this component a Server Component.
+ * content scrolling beneath — the gazette grammar's own device, zero JS in
+ * the shell. SiteNav and MobileNav are the client islands (Next 16 has no
+ * server pathname, by design).
  *
- * Mobile (< 40rem): the nav is hidden and no burger is shown this phase — a
- * dead placeholder would be a broken affordance. The working burger + drawer
- * arrive together in Phase 5. Routes remain reachable by URL meanwhile (no
- * regression — that was already the only way).
+ * Mobile (< 40rem): SiteNav is hidden and the burger + drawer ship (Phase 5)
+ * — both render from NAV_ITEMS so desktop and mobile never drift (§14).
  */
 export function SiteHeader() {
   return (
@@ -26,6 +26,7 @@ export function SiteHeader() {
           regi
         </Link>
         <SiteNav />
+        <MobileNav />
       </div>
     </header>
   );
