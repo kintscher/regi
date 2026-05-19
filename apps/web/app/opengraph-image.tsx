@@ -15,7 +15,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "regi — Aggregator für Regensdorf ZH";
+export const alt = "regi — alles Wichtige aus deiner Gemeinde Regensdorf";
 
 // Tokens copied from app/globals.css :root (asset-generation exception —
 // ImageResponse cannot read CSS variables at request time).
@@ -67,8 +67,8 @@ export default async function Image() {
           letterSpacing: "-0.005em",
         }}
       >
-        Digitales Gemeindeblatt für Regensdorf ZH — Wetter, Abfahrten, Abfall, amtliche
-        Mitteilungen, automatisiert aus öffentlichen Datenquellen.
+        Alles Wichtige aus deiner Gemeinde Regensdorf — Wetter, Abfahrten, Abfall, Veranstaltungen
+        und amtliche Mitteilungen, automatisiert aus öffentlichen Datenquellen.
       </div>
       <div style={{ flex: 1 }} />
       <div

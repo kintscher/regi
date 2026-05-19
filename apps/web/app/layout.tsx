@@ -21,11 +21,11 @@ const siteUrl = process.env.SITE_URL ?? "https://regi.ch";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "regi — Aggregator für Regensdorf ZH",
+    default: "regi — alles Wichtige aus deiner Gemeinde Regensdorf",
     template: "%s · regi",
   },
   description:
-    "Digitales Gemeindeblatt für Regensdorf ZH. Wetter, Abfahrten, Abfall, amtliche Mitteilungen — automatisiert aus öffentlichen Schweizer Datenquellen.",
+    "Alles Wichtige aus deiner Gemeinde Regensdorf — Wetter, Abfahrten, Abfall, Veranstaltungen und amtliche Mitteilungen, automatisiert aus öffentlichen Schweizer Datenquellen.",
   applicationName: "regi",
   openGraph: {
     type: "website",

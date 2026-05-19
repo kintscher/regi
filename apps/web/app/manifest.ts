@@ -10,10 +10,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "regi — Aggregator für Regensdorf ZH",
+    name: "regi — alles Wichtige aus deiner Gemeinde Regensdorf",
     short_name: "regi",
     description:
-      "Digitales Gemeindeblatt für Regensdorf ZH. Wetter, Abfahrten, Abfall, amtliche Mitteilungen — automatisiert aus öffentlichen Schweizer Datenquellen.",
+      "Alles Wichtige aus deiner Gemeinde Regensdorf — Wetter, Abfahrten, Abfall, Veranstaltungen und amtliche Mitteilungen, automatisiert aus öffentlichen Schweizer Datenquellen.",
     start_url: "/",
     display: "standalone",
     background_color: "#faf8f4",
