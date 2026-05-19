@@ -968,6 +968,73 @@ h2 {
   }
 }
 
+/* --- Site chrome: footer (§14) ---------------------------------------------
+   The gazette imprint, not a SaaS megafooter: a quiet left-aligned block,
+   one column at every breakpoint (no split bar to reflow). A --rule-strong
+   top rule bookends the masthead's --rule-strong bottom rule, so the page
+   content sits in a clearly bounded gazette column. Footer links use the
+   same non-accent chrome-link grammar as .site-nav__link (keeps accent rare;
+   §2/§14). Tokens only. --------------------------------------------------- */
+.site-foot {
+  background: var(--paper);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.site-foot__inner {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: var(--space-7) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.site-foot__tagline {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+.site-foot__attr {
+  font-size: var(--text-sm);
+  color: var(--ink-meta);
+}
+
+.site-foot__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+/* middot separator as decorative generated content — no extra DOM, not
+   focusable, the .notice__sep / .event__sep voice (--rule-strong) */
+.site-foot__item + .site-foot__item::before {
+  content: "·";
+  margin-right: var(--space-2);
+  color: var(--rule-strong);
+}
+
+.site-foot__link {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-meta);
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: color 0.15s ease;
+}
+
+.site-foot__link:hover {
+  color: var(--ink);
+}
+
+.site-foot__copy {
+  font-size: var(--text-xs);
+  color: var(--ink-meta);
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one

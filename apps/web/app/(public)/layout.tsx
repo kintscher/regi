@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { SiteFooter } from "@/components/site-footer/site-footer";
 import { SiteHeader } from "@/components/site-header/site-header";
 
 /**
@@ -24,6 +25,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <div id="inhalt" tabIndex={-1} className="site-main">
         {children}
       </div>
+      <SiteFooter />
     </>
   );
 }
