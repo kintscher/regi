@@ -609,3 +609,135 @@ This is the template for any future *global chrome* (a command bar, a
 site-wide banner): obey the per-page gazette grammar, carry state by ink
 weight not accent, introduce no new token, stay RSC except for the smallest
 necessary client island.
+
+---
+
+## 15. Dashboard «Heute» — `.dash-section…` (§13 template, generalised)
+
+`/` is the gazette **front page**. §13 named this exact use ("the
+template for any future *multi-section* page (a future dashboard-style
+overview…)"). §15 is that template realised — not a new aesthetic.
+ADR 0014 records the system-level reasoning behind the one decision
+that defines the page: **one continuous column at every breakpoint**.
+
+### Why single-column (the resolved fork)
+
+The Phase-3 brief pre-specified a desktop 2-column grid for the
+medium-priority editorial trio. That arrangement cannot live inside
+the system without breaking three of its own laws — §11 forbids
+vertical rules (a column reading needs one); §1 / §13 forbid tile
+layouts; halving the 48 rem shell starves the `.notice`
+`4.75rem 1fr` grid and the 62 ch title-measure. The system's repeated
+move (§9–§14) is "re-set the requirement in the existing grammar",
+and the existing grammar for many sections **is** §13. The dashboard
+is that, scaled — six rubric-broken sections in one calm column,
+mobile and desktop alike. The reused primitives (`.notice`,
+`.weather`, `.ov`) already self-collapse at 39.99 rem; §15 adds **no
+new breakpoint logic of its own**. Full reasoning + reversal path:
+ADR 0014.
+
+### The `.dash-section` primitive
+
+A new namespace, on the established per-feature precedent
+(`.weather__`, `.event__`, `.ov__`, `.gemeinde__`, `.abfall__`). The
+§13 `.abfall__sectionhead` structure **generalised** — same shape, no
+waste-specificity, **zero new tokens** (the §14 discipline verbatim).
+
+- **`.dash-section`** — the section frame. No border, no background,
+  no padding of its own; sections separated only by vertical space
+  (`.dash-section + .dash-section { margin-top: --space-7 }`).
+- **`.dash-section__head`** — the lighter masthead, stepped down from
+  `.page__head` exactly as `.abfall__sectionhead` is: light `--rule`
+  (not `--rule-strong`), `--text-lg` (not `--text-xl`), global
+  `h2`/600 — Müller-Brockmann hierarchy by rule strength + size, with
+  zero box. Baseline-aligned flex row pushes "Alle anzeigen →" to the
+  far end (the editorial section-jump device, not a SaaS split bar).
+  On a narrow screen `flex-wrap` drops the link beneath the title —
+  honest, no extra breakpoint.
+- **`.dash-section__title`** — `--text-lg`/600. `scroll-margin-top`
+  keeps a deep-linked rubric off the viewport edge (§13 / WIG).
+- **`.dash-section__note`** — the quiet qualifier ("nächste 7 Tage",
+  "Bahnhof Regensdorf-Watt"). The `.tag` register verbatim: `--text-xs`
+  / 500 / uppercase / `0.06em` / `--ink-meta`. Direct reuse of the
+  `.abfall__sectionnote` grammar.
+- **`.dash-section__more`** — the «Alle anzeigen →» control. The §14
+  **chrome-link grammar** (the §12 affordance-split applied): a
+  `.tag`-register `<Link>` — `--text-xs` / 500 / uppercase / `0.06em` /
+  `--ink-meta`, hover darkens to `--ink` (interactive, **not** accent),
+  `padding-block: --space-2` for the ≥24 px pointer target
+  (WCAG 2.5.8, the §14 nav-link precedent), `transition: color 0.15s
+  ease`. The trailing `→` (U+2192, `aria-hidden`) is the same-site
+  analog of `.ext`'s external `↗` — **ink not accent because the
+  destination is internal**. §2 reserves accent for
+  `links / external / in-page-selection` only; a section-jump link is
+  none of those, so it must not spend the accent budget. Real `<Link>`
+  (prefetch, keyboard, shareability — the §12 precedent); distinct
+  visible label per section, and the rubric `<h2>` contextualises the
+  link via `aria-labelledby` (WCAG 2.4.4 in-context).
+- **`.dash-section__empty`** — the section-scoped empty / loading line.
+  A one-line `--ink-meta` paragraph at `padding-block: --space-5` —
+  held layout height, never an omitted block. Inline, **not** the
+  `--surface` `.empty` panel (a panel between ruled sections would
+  read as the forbidden tile, §1). The full-page `.empty` panel stays
+  for whole-page-empty cases on the dedicated routes.
+- **`.dash-section__empty-hint`** — the optional second line, the
+  `.empty__hint` voice (`--text-sm` / `--ink-meta`).
+
+### Section order, content & hierarchy
+
+Masthead = `<h1 class="page__title">Heute</h1>` + a `.page__meta`
+**full dateline** computed `Europe/Zurich` at request time
+("Dienstag, 19. Mai 2026"). The dateline is the gazette masthead's
+own device — same `.page__meta` slot `/abfall` uses for "Stand: …",
+same mono `--ink-meta` voice, **no new token**.
+
+Then six stacked `.dash-section`s, ordered by the §14 IA logic
+(everyday-service frequency first, editorial after):
+
+| # | Rubric          | Body (reused unchanged)                                                  | Note                    | More →                                     |
+|---|-----------------|--------------------------------------------------------------------------|-------------------------|--------------------------------------------|
+| 1 | Wetter          | `<WeatherWidget data={getWeather(1)}>`                                   | —                       | Zur Wetterseite → `/wetter`                |
+| 2 | Abfahrten       | condensed `<DepartureBoard>` (~5 rows, **no `<LiveRefresh>`**)           | Bahnhof Regensdorf-Watt | Alle Abfahrten → `/ov`                     |
+| 3 | Abfall          | `.notice` rows with `.abfall__meta` — regular + special, **7-day** horizon | nächste 7 Tage        | Abfallkalender → `/abfall`                 |
+| 4 | Amtliches       | newest **3** `.notice` rows — title-only, quiet `.tag` source label       | —                       | Alle amtlichen Mitteilungen → `/amtliches` |
+| 5 | Gemeinde        | newest **3** `.notice` rows — title-only                                  | —                       | Alle Gemeinde-Mitteilungen → `/gemeinde`   |
+| 6 | Veranstaltungen | next **3** `.notice` rows + `.event__meta` (time · place)                 | —                       | Alle Veranstaltungen → `/veranstaltungen`  |
+
+### The dashboard is accent-free — and that is the point
+
+Sections 4–6 are deliberately title-only: no body clamp, **no per-row
+external `↗` link**. Repeating an accent affordance on 9 medium-
+priority rows would violate §2 ("an accent only — never a flood").
+The section's single non-accent "Alle anzeigen →" is the only jump
+affordance. §1 explicitly designed the title-only `.notice` as a
+first-class "deliberate one-line gazette record" — the dashboard is
+its ideal use. The net effect: a front page essentially free of
+`--accent`. A printed-index voice, not a product surface. Click
+through to the dedicated route for bodies, bounded per-row external
+links, live refresh, facette filters, and full page colophons.
+
+### Loading & empty states
+
+Each section owns its own `<Suspense>` boundary. The rubric head
+renders immediately while the items area suspends with a
+`.dash-section__empty` "Wird geladen …" line at consistent height —
+no spinner, no shimmer (system has exactly one motion, `regi-rise`).
+Empty copy stays terse and non-redundant ("Keine … in den nächsten
+Tagen.") because the always-present head `more →` already carries the
+route reference. Layout height is held in every state — a missing
+block would be a layout jump, against the §13 consistent-column
+discipline.
+
+### Mobile vs desktop
+
+Identical structure at both. The reused primitives self-collapse at
+39.99 rem (`.notice` gutter → meta line, `.weather__params` hidden,
+`.ov__c-plat` hidden); the dashboard adds only `flex-wrap` on
+`.dash-section__head` so "Alle anzeigen →" can drop beneath the title
+on narrow screens. **No new breakpoint logic** — the responsive
+surface is already in the system the dashboard composes from.
+
+This is the template for any future *front-page index* (a combined
+homepage with more sources, a press archive overview, a service hub):
+the §13 rubric-break grammar generalised, primitives reused
+unchanged, accent absent, single column, **no new token**.
