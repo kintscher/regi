@@ -217,12 +217,10 @@ async function AbfahrtenBody() {
   // — those are the /ov page's job (ADR 0011 live board).
   const board = await fetchStationboard(5);
   if (!board.ok) {
-    return (
-      <p className="dash-section__empty">
-        Abfahrten momentan nicht verfügbar.
-        <span className="dash-section__empty-hint">Live-Daten auf /ov.</span>
-      </p>
-    );
+    // No path-as-text hint ("Live-Daten auf /ov.") — reads as "slash o v" to
+    // screen readers and the section head's "Alle Abfahrten →" already
+    // provides the route. WIG: empty-state copy without SR-noisy paths.
+    return <p className="dash-section__empty">Abfahrten momentan nicht verfügbar.</p>;
   }
   if (board.departures.length === 0) {
     return <p className="dash-section__empty">Keine Abfahrten in nächster Zeit.</p>;
@@ -496,7 +494,7 @@ export default function HeutePage() {
       <SectionShell
         id="abfall"
         title="Abfall"
-        note="nächste 7 Tage"
+        note={"nächste 7 Tage"}
         href="/abfall"
         moreLabel="Abfallkalender"
         loadingHint="Abfuhren werden geladen …"
