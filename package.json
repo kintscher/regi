@@ -2,6 +2,7 @@
   "name": "regi",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "web": "pnpm --filter @regi/web",
     "typecheck": "pnpm -r typecheck",
