@@ -473,3 +473,139 @@ risk becoming cards/panels; §1 forbids that. Solved as a printed-Amtsblatt
 This is the template for any future *multi-section* page (a future
 dashboard-style overview, a combined service page): rubric breaks not cards,
 `.notice` lists reused under stepped-down heads, exceptions by weight.
+
+---
+
+## 14. Site chrome — `.site-header…` / `.site-foot…` (masthead & imprint)
+
+§6 deferred header/nav/footer as "explicitly **not** part of this system
+(separate task)". This is that task. Chrome is global and persistent — on
+every page, owned by `app/(public)/layout.tsx`, not by any page — so it is
+documented apart from §1–§13, **but obeys the same gazette grammar**: one
+Geist family, the warm monochrome tokens, hairlines only, no
+box/card/pill/shadow, accent links/selection-only. It is the printed
+gazette's *masthead* and *imprint* reset for the screen, not an app bar.
+
+### Information architecture: a flat 7-rubric nav, no dropdown
+
+The nav is a flat list in a fixed, meaningful order:
+`Heute · Amtliches · Gemeinde · Veranstaltungen · Wetter · ÖV · Abfall`.
+Four reasons it is flat, not a «5 + Mehr ▾» disclosure:
+
+1. **Frequency.** Wetter, ÖV and Abfall are the most-consulted routes (a
+   resident checks departures and the bin day far more often than official
+   notices). Hiding the highest-traffic rubrics behind a dropdown inverts
+   the IA. «≤5 top-level items» is a SaaS heuristic, not an editorial one.
+2. **Reference class.** The model is a Swiss newspaper masthead (NZZ/FT
+   carry 10–12 ressorts flat), not a product top-bar. Seven rubrics fit
+   comfortably within the 48rem measure — verified, not assumed.
+3. **§9 discipline.** A dropdown would be the *first* disclosure primitive
+   in the whole system (hover/click/escape/focus, a client island)
+   introduced only to hide three links. «Wenig Code, der viel tut».
+4. **Cluster via order, not submenu.** The two natural groups — civil/
+   editorial (Heute, Amtliches, Gemeinde, Veranstaltungen) and everyday
+   service (Wetter, ÖV, Abfall) — are expressed by *adjacency and
+   sequence*, the gazette's own rubric-index device. Exactly the §9–§13
+   move: re-set the requirement in the existing grammar instead of
+   importing a product component. The flat ordered nav *is* the section
+   index of a printed gazette.
+
+`NAV_ITEMS` is the single source of truth — the desktop nav and the
+Phase-5 mobile drawer both render from it, so the two cannot drift.
+
+### Active state: ink weight for chrome — the reasoned §12 divergence
+
+The current rubric is `aria-current="page"` + **weight 600 + full
+`--ink`** — the §11 emphasis device (`.ov__delay--late`,
+`.abfall__shift`), **never `--accent`**. §12 `.catfilter` resolves an
+apparently identical case (a selected `<Link>` with `aria-current="page"`)
+the *opposite* way — accent-as-selection, triple-encoded. The divergence is
+principled, and defines a rule future components inherit **by class of
+control**:
+
+- **In-page selection** (a filter scoped to one page, transient,
+  contextual — §12): selection is the sanctioned accent role (§2 token
+  table: «Links, external affordance, **selection**»). Accent is rare and
+  local.
+- **Global chrome** (the masthead, persistent on every page, cross-page):
+  accent here would be a **flood** — exactly what §2 forbids («an accent
+  only — never a flood»). State is carried by ink weight + the non-visual
+  `aria-current="page"` (a large `--ink-meta`→`--ink` darkness delta plus
+  weight — robust without colour, WCAG 1.4.1).
+
+Header nav links and footer legal links share **one** non-accent
+chrome-link grammar: `--ink-meta`, hover darkens to `--ink` (the §12
+affordance-split — hover is *not* accent), focus reuses the global 2px
+accent `:focus-visible` ring. Accent therefore stays
+links/external/in-page-selection-only across the entire surface.
+
+### Masthead composition
+
+- **Wordmark** (`.site-header__mark`, a link to `/`): the list-title voice
+  — `--text-lg` / 600 / `-0.01em`, **no new token**. Structurally dominant
+  (fixed top-left, persistent, under the strong masthead rule) yet visually
+  quiet — deliberately *not* `--text-xl`, so each page's own H1 stays the
+  largest element on that page (content-first; chrome recedes). The §1
+  «dominant by position, quiet by size» reasoning, applied to the
+  nameplate. Hover = underline + 2px offset (the `.ext` device, non-accent).
+- **Nav** (`.site-nav__link`): the quiet uppercase-tracked `.tag` register
+  (identical to `.catfilter__opt`) — a rubric index, not a button bar.
+  `--space-2` block padding lifts every rubric to a ≥24px pointer target
+  (WCAG 2.5.8) while `--space-3` band padding keeps the masthead a calm
+  strip.
+- **Sticky, zero-JS, no shadow.** `position: sticky; top: 0` with an opaque
+  `--paper` background and the permanent `--rule-strong` masthead rule (the
+  rule `.page__head` already uses). Content scrolling beneath is separated
+  by the opaque band + rule — no scroll listener, no elevation, no
+  translucency/blur (a SaaS glass device). The header stays an RSC; only
+  `SiteNav` ships JS (an `aria-current` resolver via `usePathname` — Next 16
+  has no server pathname, by design; verified against the docs).
+- **Skip link** first in the DOM (WCAG 2.4.1), revealed by `transform`
+  (never an animated layout property), targeting `#inhalt` — a
+  `tabindex=-1` wrapper, **not** a `<main>` (each page owns its
+  `<main className="page">`; a layout-level `<main>` would duplicate the
+  landmark). `.site-main:focus { outline: none }` is retained deliberately:
+  the GOV.UK skip-target pattern — the indicator is the skip link's *own*
+  visible focus + the content reveal + correct subsequent tab order; a 2px
+  ring around the entire content region would be worse UX. Documented here
+  so it is not mis-read as the `outline-none`-without-replacement
+  anti-pattern.
+- **Mobile (< 39.99rem):** wordmark only — the nav is hidden and **no
+  burger this phase**; a placeholder that does nothing is a broken
+  affordance, against the system's honesty principle. The working burger +
+  off-canvas drawer ship together in Phase 5; routes stay reachable by URL
+  meanwhile (no regression — that was already the only way).
+
+### Footer: a gazette imprint, not a megafooter
+
+`.site-foot` is the imprint line of a printed gazette: a quiet,
+left-aligned, **single-column** block, identical at every breakpoint (no
+split bar to reflow — a split footer is a SaaS pattern). A `--rule-strong`
+top rule **bookends** the masthead's `--rule-strong` bottom rule, so page
+content sits in a bounded gazette column. Lines, in reading order: tagline
+(`--ink-muted`); the shortened source attribution, which cross-references
+«Quellen» by name **link-free** (the actual Quellen link is in the
+legal-links row, not duplicated; the full licensed source list is
+auto-generated on `/quellen`, Phase 4); the mandatory legal links
+(`Quellen · Impressum · Datenschutz · Kolophon`, middot separators in
+`--rule-strong` as decorative generated content) in a labelled
+`<nav aria-label="Rechtliches">`; and the copyright. Footer links use the
+shared chrome-link grammar — non-accent, so the register that opens the
+page is the register that closes it.
+
+### Token discipline
+
+§14 introduces **no new token** — not a colour, type size, weight, or
+spacing step. Wordmark = `--text-lg`/600; nav = the `.tag` register;
+everything else is existing `--ink-*` / `--rule*` / `--space-*`. The only
+literals are a single `z-index: 10` (one sticky layer; a z-scale would be
+over-engineering for one element) and `env(safe-area-inset-*)` guards on
+the full-bleed sticky inner padding (WIG Safe Areas). No `regi-rise` reveal
+on chrome: like `.catfilter`, chrome must be usable the instant the page
+paints (the only motion is the established unguarded `color 0.15s` link
+transition and the skip link's reduced-motion-guarded `transform`).
+
+This is the template for any future *global chrome* (a command bar, a
+site-wide banner): obey the per-page gazette grammar, carry state by ink
+weight not accent, introduce no new token, stay RSC except for the smallest
+necessary client island.
