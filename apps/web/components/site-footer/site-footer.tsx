@@ -21,7 +21,7 @@ export function SiteFooter() {
   return (
     <footer className="site-foot">
       <div className="site-foot__inner">
-        <p className="site-foot__tagline">regi — Aggregator für Regensdorf ZH</p>
+        <p className="site-foot__tagline">regi — Aggregator für Regensdorf&nbsp;ZH</p>
         <p className="site-foot__attr">
           Daten aus öffentlichen Schweizer Quellen — Details unter «Quellen».
         </p>
@@ -36,7 +36,7 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <p className="site-foot__copy">© 2026 regi</p>
+        <p className="site-foot__copy">©&nbsp;2026 regi</p>
       </div>
     </footer>
   );

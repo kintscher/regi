@@ -856,7 +856,7 @@ h2 {
 .skip-link {
   position: absolute;
   left: var(--space-5);
-  top: -3rem;
+  top: var(--space-2);
   z-index: 20;
   padding: var(--space-2) var(--space-3);
   background: var(--paper);
@@ -864,11 +864,14 @@ h2 {
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
-  transition: top 0.15s ease;
+  /* hidden by transform, not by animating the layout box: WIG "animate
+     transform/opacity only". Revealed on keyboard focus. */
+  transform: translateY(calc(-100% - var(--space-5)));
+  transition: transform 0.15s ease;
 }
 
 .skip-link:focus-visible {
-  top: var(--space-2);
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -891,8 +894,13 @@ h2 {
 .site-header__inner {
   max-width: 48rem;
   margin-inline: auto;
-  /* same horizontal measure/padding as .page so the rule aligns to the body */
-  padding: var(--space-4) var(--space-5);
+  /* block padding stepped down from --space-4: the nav links now carry their
+     own --space-2 block padding (≥24px hit target, WCAG 2.5.8) — the band
+     height stays calm. Inline: same --space-5 measure as .page, but
+     safe-area-aware since the header is full-bleed sticky (WIG Safe Areas). */
+  padding-block: var(--space-3);
+  padding-inline: max(var(--space-5), env(safe-area-inset-left))
+    max(var(--space-5), env(safe-area-inset-right));
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -908,6 +916,14 @@ h2 {
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
+  touch-action: manipulation;
+}
+
+/* hover affordance in the system's link-hover device (underline + 2px
+   offset, like .ext) — non-accent: chrome never uses accent (§2/§14) */
+.site-header__mark:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .site-nav__list {
@@ -924,6 +940,10 @@ h2 {
    index, not a button bar */
 .site-nav__link {
   display: inline-block;
+  /* block padding lifts the hit target to ≥24px (WCAG 2.5.8); the 12px
+     uppercase glyph alone was ~19px. Width passes via the 24px-circle
+     spacing exception (the --space-5 inter-item gap). */
+  padding-block: var(--space-2);
   font-size: var(--text-xs);
   font-weight: 500;
   text-transform: uppercase;
@@ -1018,6 +1038,10 @@ h2 {
 }
 
 .site-foot__link {
+  display: inline-block;
+  /* same ≥24px hit target as the nav link (WCAG 2.5.8); also fixes the
+     borderline vertical spacing when the link row wraps on mobile */
+  padding-block: var(--space-2);
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ink-meta);
