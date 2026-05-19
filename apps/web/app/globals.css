@@ -840,6 +840,134 @@ h2 {
   border-top: 1px solid var(--rule);
 }
 
+/* --- Site chrome: masthead (§14) -------------------------------------------
+   Header + footer are global chrome, deliberately NOT part of the per-page
+   gazette system (§6) — but they obey the same grammar: one typeface, warm
+   monochrome tokens, hairlines only, no box/card/pill/shadow. Accent is
+   links/external/in-page-selection only (§2); the masthead is persistent
+   cross-page chrome, so the active rubric is INK WEIGHT, never accent — the
+   §11 device (.ov__delay--late). This intentionally diverges from §12
+   .catfilter (accent-as-selection): that is a transient in-page filter,
+   chrome is global. See docs/design-system.md §14 for the full rationale.
+   Tokens only. ------------------------------------------------------------- */
+
+/* Skip link (WCAG 2.4.1): off-screen until focused, then a real visible
+   control on paper with the global accent focus ring. */
+.skip-link {
+  position: absolute;
+  left: var(--space-5);
+  top: -3rem;
+  z-index: 20;
+  padding: var(--space-2) var(--space-3);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus-visible {
+  top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  /* single sticky layer in the app; no z-index token system needed for one */
+  z-index: 10;
+  background: var(--paper);
+  /* the masthead rule, exactly like .page__head — also the scroll separator:
+     opaque paper + this permanent strong hairline need no shadow or JS */
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.site-header__inner {
+  max-width: 48rem;
+  margin-inline: auto;
+  /* same horizontal measure/padding as .page so the rule aligns to the body */
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+/* the nameplate: list-title voice (--text-lg / 600), dominant by position not
+   size so the page H1 (--text-xl) stays the largest element on any page */
+.site-header__mark {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+}
+
+/* rubric index voice — the .tag / .catfilter__opt register (uppercase,
+   tracked, --ink-meta): the masthead reads as a printed gazette's section
+   index, not a button bar */
+.site-nav__link {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-meta);
+  text-decoration: none;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: color 0.15s ease;
+}
+
+/* inactive hover darkens toward full ink (signals interactive) — NOT accent;
+   accent stays links/selection only (the §12 affordance-split precedent) */
+.site-nav__link:hover {
+  color: var(--ink);
+}
+
+/* active rubric: ink weight + full ink, no accent, no underline rule — the
+   §11 emphasis device; aria-current="page" carries the non-visual encoding */
+.site-nav__link[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* flex spacer that pushes the footer down (root <body> is the flex column);
+   also the skip-link target. tabindex=-1 + no outline: focus lands here only
+   via the skip link and the content itself is the obvious indicator. */
+.site-main {
+  flex: 1;
+}
+
+.site-main:focus {
+  outline: none;
+}
+
+/* Mobile: hide the nav (wordmark-only masthead). No burger this phase — the
+   working burger + drawer ship together in Phase 5; a dead one would be a
+   broken affordance. Same 39.99rem breakpoint as the rest of the system. */
+@media (max-width: 39.99rem) {
+  .site-nav {
+    display: none;
+  }
+}
+
 /* =========================================================================
    DARK MODE — DEFERRED STUB (CLAUDE.md §5 wants parity; this iteration ships
    light only by briefing override). Enabling dark = uncomment + tune this one
