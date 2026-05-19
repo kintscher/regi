@@ -7,6 +7,25 @@
 
 ---
 
+## Implementierungsstand
+
+Diese Datei ist eine vollständige Recherche, kein Wahrheits-Status der Implementation. Aktueller Stand der ingest-Pipeline (`apps/ingest/src/sources/`):
+
+| Quelle                          | Status                | Pattern                                                       |
+|---------------------------------|-----------------------|---------------------------------------------------------------|
+| ePublikation.ch (A1)            | implementiert (cron)  | API-Polling, ADR 0010                                         |
+| regensdorf.ch News (A2)         | implementiert (cron)  | Embedded-JSON Scraping, ADR 0013                              |
+| regensdorf.ch Abfallkalender (E)| implementiert (cron)  | Embedded-JSON Scraping, ADR 0013                              |
+| Eventfrog (G1)                  | implementiert (cron)  | API + API-Key, ADR 0012                                       |
+| Existenz Weather (D1)           | implementiert (cron)  | API-Polling                                                   |
+| Transport (B1)                  | implementiert (on-demand) | On-demand RSC-Fetch, ADR 0011                            |
+| ZH-Newsroom RSS / Presse        | **abgelehnt**         | siehe Issue #15 (presse-google-news rejected)                |
+| Alles übrige (Statistik, Zefix, OSM, Hydro, Luft, Wikidata, swisstopo, …) | Roadmap | nicht in MVP, kandidiert für v1.x |
+
+Wenn eine Quelle implementiert wird oder ein Recherche-Detail sich beim Bau als falsch erweist, hier nachpflegen statt die ursprüngliche Quellen-Beschreibung im Text neu zu schreiben — der Recherche-Kontext bleibt nützlich, auch wenn die Annahmen daraus überholt sind.
+
+---
+
 ## Direktantworten auf die zentralen Fragen
 
 ### 1. Hat ePublikation.ch eine öffentlich nutzbare API?

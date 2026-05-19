@@ -8,6 +8,27 @@
 
 ---
 
+## Contents
+
+1. [Rationale](#1-rationale)
+2. [Colour tokens](#2-colour-tokens)
+3. [Typography](#3-typography)
+4. [Spacing](#4-spacing)
+5. [Layout & grid](#5-layout--grid)
+6. [Component primitives](#6-component-primitives)
+7. [Motion & accessibility](#7-motion--accessibility)
+8. [How future pages reuse this](#8-how-future-pages-reuse-this)
+9. [Weather strip — `.weather…`](#9-weather-strip--weather-added-with-the-existenz-source)
+10. [Event row — `.event…`](#10-event-row--event-added-with-the-eventfrog-source)
+11. [Departure board — `.ov…`](#11-departure-board--ov-added-with-the-transport-source)
+12. [Category filter — `.catfilter…`](#12-category-filter--catfilter-added-with-the-regensdorf-news-source)
+13. [Section header & multi-section page — `.abfall…`](#13-section-header--multi-section-page--abfall-added-with-the-regensdorf-waste-source)
+14. [Site chrome — `.site-header…` / `.site-foot…`](#14-site-chrome--site-header--site-foot-masthead--imprint)
+15. [Dashboard «Heute» — `.dash-section…`](#15-dashboard-heute--dash-section-13-template-generalised)
+16. [Page prose — `.page__prose`](#16-page-prose--page__prose-mandatory-info--legal-pages)
+
+---
+
 ## 1. Rationale
 
 **Concept: «Amtsblatt, neu gesetzt» — the municipal gazette, reset for the
