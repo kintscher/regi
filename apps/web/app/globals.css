@@ -1188,6 +1188,7 @@ h2 {
      hover underlines. */
   color: var(--accent);
   text-decoration: none;
+  touch-action: manipulation;
   transition: color 0.15s ease;
 }
 

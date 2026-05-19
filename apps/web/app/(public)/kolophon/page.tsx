@@ -52,7 +52,12 @@ export default function KolophonPage() {
         <h2>Code und Lizenzen</h2>
         <p>
           Quellcode öffentlich auf{" "}
-          <a href="https://github.com/kintscher/regi" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://github.com/kintscher/regi"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Quellcode auf github.com/kintscher/regi (öffnet in neuem Tab)"
+          >
             github.com/kintscher/regi
           </a>
           . Die verwendeten Bibliotheken (Next.js, React, Drizzle, Geist, Tailwind, Hono, Zod)

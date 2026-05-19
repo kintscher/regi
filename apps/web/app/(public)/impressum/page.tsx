@@ -29,9 +29,11 @@ export default function ImpressumPage() {
         <dl>
           <dt>Verantwortlich</dt>
           <dd>
-            Yannik Kintscher
-            <br />
-            8105 Regensdorf ZH
+            <address>
+              Yannik Kintscher
+              <br />
+              8105 Regensdorf ZH
+            </address>
           </dd>
 
           <dt>Kontakt</dt>

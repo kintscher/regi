@@ -86,7 +86,7 @@ export default async function QuellenPage() {
   const items = await getSources();
 
   const count = new Intl.NumberFormat("de-CH").format(items.length);
-  const countLabel = items.length === 1 ? "1 Quelle" : `${count} Quellen`;
+  const countLabel = items.length === 1 ? "1 Quelle" : `${count} Quellen`;
 
   return (
     <main className="page">
