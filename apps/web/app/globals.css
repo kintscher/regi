@@ -1368,7 +1368,7 @@ h2 {
 }
 
 /* --- Page prose (§16) — typography for the mandatory info/legal pages
-   (/quellen, /impressum, /datenschutz, /kolophon). These are flowing text
+   (/quellen, /impressum, /datenschutz). These are flowing text
    with sub-heads and labelled fields, NOT dated lists; the .notice grammar
    doesn't fit. .page__prose composes WITH .page (shell + padding) and styles
    its direct content (h2 sub-heads, paragraphs, definition lists) using
@@ -1393,9 +1393,9 @@ h2 {
 
 .page__prose a {
   /* prose links inherit the .ext accent grammar (the system's link voice) —
-     legal/colophon pages link to external destinations (mailto:, github,
-     license texts), which is exactly the .ext role. No underline at rest;
-     hover underlines. */
+     legal pages link to external destinations (mailto:, github, license
+     texts), which is exactly the .ext role. No underline at rest; hover
+     underlines. */
   color: var(--accent);
   text-decoration: none;
   touch-action: manipulation;

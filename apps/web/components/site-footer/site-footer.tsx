@@ -14,7 +14,6 @@ const LEGAL_LINKS = [
   { href: "/quellen", label: "Quellen" },
   { href: "/impressum", label: "Impressum" },
   { href: "/datenschutz", label: "Datenschutz" },
-  { href: "/kolophon", label: "Kolophon" },
 ] as const;
 
 export function SiteFooter() {
