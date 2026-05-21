@@ -659,7 +659,7 @@ content sits in a bounded gazette column. Lines, in reading order: tagline
 «Quellen» by name **link-free** (the actual Quellen link is in the
 legal-links row, not duplicated; the full licensed source list is
 auto-generated on `/quellen`, Phase 4); the mandatory legal links
-(`Quellen · Impressum · Datenschutz · Kolophon`, middot separators in
+(`Quellen · Impressum · Datenschutz`, middot separators in
 `--rule-strong` as decorative generated content) in a labelled
 `<nav aria-label="Rechtliches">`; and the copyright. Footer links use the
 shared chrome-link grammar — non-accent, so the register that opens the
@@ -842,8 +842,8 @@ instance arrives or when one source needs its meta-row to diverge.
 
 ## 16. Page prose — `.page__prose` (mandatory info / legal pages)
 
-The mandatory Phase-4 pages — `/quellen`, `/impressum`, `/datenschutz`,
-`/kolophon` — are flowing prose with sub-heads and labelled fields,
+The mandatory Phase-4 pages — `/quellen`, `/impressum`, `/datenschutz`
+— are flowing prose with sub-heads and labelled fields,
 not dated lists. The `.notice` grammar built for the data feeds doesn't
 fit: there is no date axis to put in the gutter and the content type is
 free text, not a record. §16 introduces the smallest possible **prose
@@ -910,15 +910,12 @@ padding) and styles its **direct content**:
   (sources are a *list*, not prose). One `.page__meta` "Stand: …"
   stamp at the foot if needed; the per-row `last_synced_at` covers
   most of it.
-- **`/impressum`** — `.page__prose` with one paragraph and one `<dl>`
-  (Verantwortlich, Kontakt, Rechtsform); a `.page__meta` "Stand: …"
+- **`/impressum`** — `.page__prose` with sub-heads (Anbieter, Kontakt,
+  Sitz, Quellcode) and short paragraphs; a `.page__meta` "Stand: …"
   stamp at the bottom.
 - **`/datenschutz`** — `.page__prose` with two or three `<h2>`
   sub-heads, paragraphs, one or two prose-`<a>` links. `.page__meta`
   "Stand: …" stamp.
-- **`/kolophon`** — `.page__prose` with sub-heads, paragraphs and a
-  `<dl>` (Tech, Code, Design, Lizenzen). `.page__meta` "Stand: …"
-  stamp.
 
 This is the template for any future *long-form text* page (an article,
 a release note, a static FAQ): wrap content in `.page__prose`, use
